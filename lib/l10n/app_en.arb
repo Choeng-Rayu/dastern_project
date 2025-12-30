@@ -1,0 +1,83 @@
+{
+  "@@locale": "en",
+  "appTitle": "DasTern",
+  "@appTitle": {
+    "description": "The application title"
+  },
+  "welcomeTitle": "Welcome to DasTern",
+  "@welcomeTitle": {
+    "description": "Title shown on welcome screen"
+  },
+  "welcomeMessage": "Your medication reminder companion",
+  "@welcomeMessage": {
+    "description": "Welcome message"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Button to start using the app"
+  },
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard screen title"
+  },
+  "medicineList": "Medicine List",
+  "@medicineList": {
+    "description": "Medicine list screen title"
+  },
+  "addMedicine": "Add Medicine",
+  "@addMedicine": {
+    "description": "Add medicine button"
+  },
+  "editMedicine": "Edit Medicine",
+  "@editMedicine": {
+    "description": "Edit medicine title"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile screen title"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings section title"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting label"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme setting label"
+  },
+  "lightMode": "Light Mode",
+  "@lightMode": {
+    "description": "Light theme option"
+  },
+  "darkMode": "Dark Mode",
+  "@darkMode": {
+    "description": "Dark theme option"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language option"
+  },
+  "khmer": "Khmer",
+  "@khmer": {
+    "description": "Khmer language option"
+  },
+  "noMedicines": "No medicines added yet",
+  "@noMedicines": {
+    "description": "Message when medicine list is empty"
+  },
+  "medicineName": "Medicine Name",
+  "@medicineName": {
+    "description": "Medicine name field label"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  }
+}
