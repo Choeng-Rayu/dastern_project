@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../l10n/app_localizations.dart';
+import '/l10n/app_localizations.dart';
 
 /// Dashboard screen - Main hub of the application
 class DashboardScreen extends StatelessWidget {

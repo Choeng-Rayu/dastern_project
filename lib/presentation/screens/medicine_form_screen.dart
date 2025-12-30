@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../l10n/app_localizations.dart';
+import '/l10n/app_localizations.dart';
 
 /// Medicine Form screen - CRUD operations for medicine
 class MedicineFormScreen extends StatelessWidget {

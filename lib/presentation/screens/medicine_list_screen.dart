@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../l10n/app_localizations.dart';
+import '/l10n/app_localizations.dart';
 
 /// Medicine List screen - Shows list of medications
 class MedicineListScreen extends StatelessWidget {

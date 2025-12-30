@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../l10n/app_localizations.dart';
+import '/l10n/app_localizations.dart';
 
 /// Main navigation screen with bottom navigation bar
 class MainNavigationScreen extends StatelessWidget {
