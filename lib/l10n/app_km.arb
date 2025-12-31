@@ -19,5 +19,12 @@
   "noMedicines": "មិនទាន់មានថ្នាំនៅឡើយទេ",
   "medicineName": "ឈ្មោះថ្នាំ",
   "save": "រក្សាទុក",
-  "cancel": "បោះបង់"
+  "cancel": "បោះបង់",
+  "hello": "សួស្តី",
+  "dateOfBirth": "ថ្ងៃកំណើត",
+  "todaySchedule": "កាលវិភាគ (ថ្ងៃនេះ)",
+  "dose": "ដុំ",
+  "patient": "អ្នកជំងឺ",
+  "completed": "បានបញ្ចប់",
+  "pending": "រងចាំ"
 }
