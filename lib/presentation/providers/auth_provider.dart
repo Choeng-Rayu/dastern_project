@@ -16,8 +16,13 @@ class AuthProvider extends ChangeNotifier {
   String? get userPhone => _currentPatient?.tel;
   bool get isLoading => _isLoading;
 
+  void _log(String message) {
+    debugPrint('👤 [AuthProvider] $message');
+  }
+
   /// Initialize auth state from storage
   Future<void> initialize() async {
+    _log('Initializing auth state...');
     _isLoading = true;
     notifyListeners();
 
@@ -25,6 +30,9 @@ class AuthProvider extends ChangeNotifier {
 
     if (_isLoggedIn) {
       _currentPatient = await _storageService.getPatientData();
+      _log('✅ Auth initialized: User ${_currentPatient?.tel}');
+    } else {
+      _log('No user logged in');
     }
 
     _isLoading = false;
@@ -36,6 +44,8 @@ class AuthProvider extends ChangeNotifier {
     required String phone,
     required String password,
   }) async {
+    _log('Attempting login for phone: $phone');
+
     // Verify credentials
     final isValid = await _storageService.verifyCredentials(
       phone: phone,
@@ -46,9 +56,11 @@ class AuthProvider extends ChangeNotifier {
       _isLoggedIn = true;
       _currentPatient = await _storageService.getPatientData();
       notifyListeners();
+      _log('✅ Login successful for: ${_currentPatient?.tel}');
       return true;
     }
 
+    _log('❌ Login failed: Invalid credentials');
     return false;
   }
 
@@ -57,6 +69,8 @@ class AuthProvider extends ChangeNotifier {
     required Patient patient,
     required String password,
   }) async {
+    _log('Registering new user: ${patient.tel}');
+
     await _storageService.saveUserData(
       patient: patient,
       password: password,
@@ -65,14 +79,20 @@ class AuthProvider extends ChangeNotifier {
     _isLoggedIn = true;
     _currentPatient = patient;
     notifyListeners();
+
+    _log('✅ Registration successful: ${patient.tel}');
   }
 
   /// Logout
   Future<void> logout() async {
+    _log('Logging out user: ${_currentPatient?.tel}');
+
     await _storageService.clearAuthData();
     _isLoggedIn = false;
     _currentPatient = null;
     notifyListeners();
+
+    _log('✅ Logout successful');
   }
 
   /// Update patient data

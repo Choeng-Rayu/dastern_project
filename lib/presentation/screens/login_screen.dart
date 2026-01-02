@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../providers/medication_provider.dart';
+import '../providers/reminder_provider.dart';
+import '../providers/intake_history_provider.dart';
 
 /// Login screen - User authentication
 class LoginScreen extends StatefulWidget {
@@ -33,6 +36,12 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final medicationProvider =
+          Provider.of<MedicationProvider>(context, listen: false);
+      final reminderProvider =
+          Provider.of<ReminderProvider>(context, listen: false);
+      final intakeHistoryProvider =
+          Provider.of<IntakeHistoryProvider>(context, listen: false);
 
       // Try to login with stored credentials
       final success = await authProvider.login(
@@ -46,8 +55,19 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         if (success) {
+          // Reload all provider data for the newly logged in user
+          debugPrint('🔄 Reloading provider data after login...');
+          await Future.wait([
+            medicationProvider.initialize(),
+            reminderProvider.initialize(),
+            intakeHistoryProvider.initialize(),
+          ]);
+          debugPrint('✅ Provider data reloaded');
+
           // Navigate to dashboard after successful login
-          context.go('/dashboard');
+          if (mounted) {
+            context.go('/dashboard');
+          }
         } else {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '/l10n/app_localizations.dart';
 import '/presentation/providers/settings_provider.dart';
 import '/presentation/providers/auth_provider.dart';
+import '/services/notification_service.dart';
 
 /// Profile screen - User settings and preferences
 class ProfileScreen extends StatelessWidget {
@@ -135,6 +136,45 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
+
+                // Test Notification Button (for development)
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final notificationService =
+                          Provider.of<NotificationService>(
+                        context,
+                        listen: false,
+                      );
+                      await notificationService.showNotification(
+                        title: '💊 Test Notification',
+                        body:
+                            'This is a test medication reminder! Check your notification bar.',
+                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Test notification sent! Check your notification bar.'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.notifications_active),
+                    label: const Text('Test Notification'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF4DD0E1),
+                      side: const BorderSide(color: Color(0xFF4DD0E1)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 // Logout Button
                 SizedBox(
