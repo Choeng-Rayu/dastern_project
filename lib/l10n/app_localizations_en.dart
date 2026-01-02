@@ -1,5 +1,3 @@
-// ignore: unused_import
-import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -118,4 +116,217 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createAccount => 'Create Account';
+
+  @override
+  String get medications => 'Medications';
+
+  @override
+  String get addMedication => 'Add Medication';
+
+  @override
+  String get editMedication => 'Edit Medication';
+
+  @override
+  String get deleteMedication => 'Delete Medication';
+
+  @override
+  String get deleteMedicationMessage => 'Are you sure you want to delete this medication?';
+
+  @override
+  String get medicationDeleted => 'Medication deleted successfully';
+
+  @override
+  String get medicationAdded => 'Medication added successfully';
+
+  @override
+  String get medicationUpdated => 'Medication updated successfully';
+
+  @override
+  String get medicationName => 'Medication Name';
+
+  @override
+  String get dosage => 'Dosage';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get unit => 'Unit';
+
+  @override
+  String get tablet => 'Tablet';
+
+  @override
+  String get ml => 'ml';
+
+  @override
+  String get mg => 'mg';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get instruction => 'Instruction';
+
+  @override
+  String get prescribedBy => 'Prescribed By';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get autoGenerateReminders => 'Auto-generate 3 daily reminders';
+
+  @override
+  String get remindersGenerated => 'Reminders generated successfully';
+
+  @override
+  String get morning => 'Morning';
+
+  @override
+  String get afternoon => 'Afternoon';
+
+  @override
+  String get evening => 'Evening';
+
+  @override
+  String get night => 'Night';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get enterMedicationName => 'Enter medication name';
+
+  @override
+  String get enterAmount => 'Enter amount';
+
+  @override
+  String get enterInstruction => 'Enter usage instructions';
+
+  @override
+  String get enterPrescriber => 'Enter prescriber name';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get noMedications => 'No medications added yet';
+
+  @override
+  String get todayReminders => 'Today\'s Reminders';
+
+  @override
+  String get upcomingReminders => 'Upcoming';
+
+  @override
+  String get completedReminders => 'Completed';
+
+  @override
+  String get markAsTaken => 'Mark as Taken';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get taken => 'Taken';
+
+  @override
+  String get missed => 'Missed';
+
+  @override
+  String get skipped => 'Skipped';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get intakeHistory => 'Intake History';
+
+  @override
+  String get adherenceRate => 'Adherence Rate';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get takenAt => 'Taken at';
+
+  @override
+  String get scheduledFor => 'Scheduled for';
+
+  @override
+  String get noHistoryYet => 'No history yet';
+
+  @override
+  String get viewHistory => 'View History';
+
+  @override
+  String get noRemindersToday => 'No reminders for today';
+
+  @override
+  String get manageReminders => 'Manage Reminders';
+
+  @override
+  String get editReminder => 'Edit Reminder';
+
+  @override
+  String get deleteReminder => 'Delete Reminder';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get days => 'Days';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get addTime => 'Add Time';
+
+  @override
+  String get noRemindersAdded => 'No reminder times added yet. Tap \'Add Time\' to set medication schedule.';
+
+  @override
+  String get timeOfDay => 'Time of Day';
+
+  @override
+  String get dosageAmount => 'Dosage Amount';
+
+  @override
+  String get activeDays => 'Active Days';
+
+  @override
+  String get addAtLeastOneReminder => 'Please add at least one reminder time';
+
+  @override
+  String get reminder => 'Reminder';
+
+  @override
+  String get delayed => 'Delayed';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get quickStats => 'Quick Stats';
+
+  @override
+  String get todayMedications => 'Today\'s Medications';
+
+  @override
+  String get quickActions => 'Quick Actions';
 }

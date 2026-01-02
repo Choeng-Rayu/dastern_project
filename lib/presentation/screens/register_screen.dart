@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
-// import '/models/patient.dart'; // TODO: Uncomment when saving to database
+import '../../models/patient.dart';
 
 /// Register screen - New user registration
 class RegisterScreen extends StatefulWidget {
@@ -24,8 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   DateTime? _selectedDateOfBirth;
   String? _selectedBloodType;
-  double?
-      _weight; // ignore: unused_field - Will be used when saving to database
+  double? _weight;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -107,25 +106,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-      // Register user with auth provider
-      await authProvider.register(
-        phone: _phoneController.text.trim(),
-        password: _passwordController.text,
+      // Create Patient object with all data
+      final patient = Patient(
         name: _nameController.text.trim(),
+        tel: _phoneController.text.trim(),
+        familyContact: _familyContactController.text.trim(),
+        bloodtype: _selectedBloodType!,
+        dateOfBirth: _selectedDateOfBirth!,
+        address: _addressController.text.trim().isEmpty
+            ? null
+            : _addressController.text.trim(),
+        weight: _weight,
       );
 
-      // TODO: Save patient data to database/backend
-      // final patient = Patient(
-      //   name: _nameController.text.trim(),
-      //   tel: _phoneController.text.trim(),
-      //   familyContact: _familyContactController.text.trim(),
-      //   bloodtype: _selectedBloodType!,
-      //   dateOfBirth: _selectedDateOfBirth!,
-      //   address: _addressController.text.trim().isEmpty
-      //       ? null
-      //       : _addressController.text.trim(),
-      //   weight: _weight,
-      // );
+      // Register user with complete patient data and password
+      await authProvider.register(
+        patient: patient,
+        password: _passwordController.text,
+      );
 
       if (mounted) {
         setState(() {
