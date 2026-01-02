@@ -1,3 +1,4 @@
+// ignore: file_names
 import './generateId.dart';
 
 enum IntakeStatus { pending, missed, skipped, taken }

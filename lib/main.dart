@@ -4,10 +4,17 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'presentation/providers/settings_provider.dart';
 import 'presentation/providers/auth_provider.dart';
+import 'presentation/providers/medication_provider.dart';
+import 'presentation/providers/reminder_provider.dart';
+import 'presentation/providers/intake_history_provider.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize notification service
+  final notificationService = NotificationService();
 
   // Initialize settings provider
   final settingsProvider = SettingsProvider();
@@ -17,11 +24,36 @@ void main() async {
   final authProvider = AuthProvider();
   await authProvider.initialize();
 
+  // Initialize medication provider
+  final medicationProvider = MedicationProvider();
+  await medicationProvider.initialize();
+
+  // Initialize reminder provider
+  final reminderProvider = ReminderProvider();
+  await reminderProvider.initialize();
+
+  // Initialize intake history provider
+  final intakeHistoryProvider = IntakeHistoryProvider();
+  await intakeHistoryProvider.initialize();
+
+  // Schedule today's reminders
+  if (authProvider.currentPatient != null) {
+    final todayReminders = reminderProvider.getTodayReminders();
+    await notificationService.scheduleRemindersForToday(
+      reminders: todayReminders,
+      medications: medicationProvider.medications,
+    );
+  }
+
   runApp(
     MultiProvider(
       providers: [
+        Provider<NotificationService>.value(value: notificationService),
         ChangeNotifierProvider.value(value: settingsProvider),
         ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider.value(value: medicationProvider),
+        ChangeNotifierProvider.value(value: reminderProvider),
+        ChangeNotifierProvider.value(value: intakeHistoryProvider),
       ],
       child: const DasternApp(),
     ),

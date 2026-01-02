@@ -18,7 +18,7 @@ import 'app_localizations_km.dart';
 /// `supportedLocales` list. For example:
 ///
 /// ```dart
-/// import 'l10n/app_localizations.dart';
+/// import 'gen_l10n/app_localizations.dart';
 ///
 /// return MaterialApp(
 ///   localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -62,8 +62,7 @@ import 'app_localizations_km.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -71,8 +70,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,8 +82,7 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -319,10 +316,435 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Account'**
   String get createAccount;
+
+  /// Medications screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Medications'**
+  String get medications;
+
+  /// Add medication button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Medication'**
+  String get addMedication;
+
+  /// Edit medication title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Medication'**
+  String get editMedication;
+
+  /// Delete medication confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Medication'**
+  String get deleteMedication;
+
+  /// Delete medication confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this medication?'**
+  String get deleteMedicationMessage;
+
+  /// Medication deleted success message
+  ///
+  /// In en, this message translates to:
+  /// **'Medication deleted successfully'**
+  String get medicationDeleted;
+
+  /// Medication added success message
+  ///
+  /// In en, this message translates to:
+  /// **'Medication added successfully'**
+  String get medicationAdded;
+
+  /// Medication updated success message
+  ///
+  /// In en, this message translates to:
+  /// **'Medication updated successfully'**
+  String get medicationUpdated;
+
+  /// Medication name field
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Name'**
+  String get medicationName;
+
+  /// Dosage field
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage'**
+  String get dosage;
+
+  /// Amount field
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// Unit field
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get unit;
+
+  /// Tablet unit
+  ///
+  /// In en, this message translates to:
+  /// **'Tablet'**
+  String get tablet;
+
+  /// Milliliter unit
+  ///
+  /// In en, this message translates to:
+  /// **'ml'**
+  String get ml;
+
+  /// Milligram unit
+  ///
+  /// In en, this message translates to:
+  /// **'mg'**
+  String get mg;
+
+  /// Other unit
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
+  /// Instruction field
+  ///
+  /// In en, this message translates to:
+  /// **'Instruction'**
+  String get instruction;
+
+  /// Prescribed by field
+  ///
+  /// In en, this message translates to:
+  /// **'Prescribed By'**
+  String get prescribedBy;
+
+  /// Reminders section title
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
+
+  /// Auto-generate reminders option
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-generate 3 daily reminders'**
+  String get autoGenerateReminders;
+
+  /// Reminders generated success message
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders generated successfully'**
+  String get remindersGenerated;
+
+  /// Morning time
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morning;
+
+  /// Afternoon time
+  ///
+  /// In en, this message translates to:
+  /// **'Afternoon'**
+  String get afternoon;
+
+  /// Evening time
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get evening;
+
+  /// Night time
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get night;
+
+  /// Delete button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Medication name hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter medication name'**
+  String get enterMedicationName;
+
+  /// Amount hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter amount'**
+  String get enterAmount;
+
+  /// Instruction hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter usage instructions'**
+  String get enterInstruction;
+
+  /// Prescriber hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter prescriber name'**
+  String get enterPrescriber;
+
+  /// Required field validation message
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// Empty medications list message
+  ///
+  /// In en, this message translates to:
+  /// **'No medications added yet'**
+  String get noMedications;
+
+  /// Today's reminders title
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Reminders'**
+  String get todayReminders;
+
+  /// Upcoming reminders section
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcomingReminders;
+
+  /// Completed reminders section
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedReminders;
+
+  /// Mark medication as taken button
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Taken'**
+  String get markAsTaken;
+
+  /// Skip button
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// Taken status
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get taken;
+
+  /// Missed status
+  ///
+  /// In en, this message translates to:
+  /// **'Missed'**
+  String get missed;
+
+  /// Skipped status
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skipped;
+
+  /// History screen title
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// Intake history title
+  ///
+  /// In en, this message translates to:
+  /// **'Intake History'**
+  String get intakeHistory;
+
+  /// Adherence rate label
+  ///
+  /// In en, this message translates to:
+  /// **'Adherence Rate'**
+  String get adherenceRate;
+
+  /// This week filter
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// This month filter
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// All filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// Taken at time label
+  ///
+  /// In en, this message translates to:
+  /// **'Taken at'**
+  String get takenAt;
+
+  /// Scheduled time label
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for'**
+  String get scheduledFor;
+
+  /// Empty history message
+  ///
+  /// In en, this message translates to:
+  /// **'No history yet'**
+  String get noHistoryYet;
+
+  /// View history button
+  ///
+  /// In en, this message translates to:
+  /// **'View History'**
+  String get viewHistory;
+
+  /// No reminders message
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders for today'**
+  String get noRemindersToday;
+
+  /// Manage reminders button
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Reminders'**
+  String get manageReminders;
+
+  /// Edit reminder title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Reminder'**
+  String get editReminder;
+
+  /// Delete reminder confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Reminder'**
+  String get deleteReminder;
+
+  /// Time label
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// Days label
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get days;
+
+  /// Active status
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// Inactive status
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// Add time button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Time'**
+  String get addTime;
+
+  /// No reminders added message
+  ///
+  /// In en, this message translates to:
+  /// **'No reminder times added yet. Tap \'Add Time\' to set medication schedule.'**
+  String get noRemindersAdded;
+
+  /// Time of day label
+  ///
+  /// In en, this message translates to:
+  /// **'Time of Day'**
+  String get timeOfDay;
+
+  /// Dosage amount label
+  ///
+  /// In en, this message translates to:
+  /// **'Dosage Amount'**
+  String get dosageAmount;
+
+  /// Active days label
+  ///
+  /// In en, this message translates to:
+  /// **'Active Days'**
+  String get activeDays;
+
+  /// Reminder validation message
+  ///
+  /// In en, this message translates to:
+  /// **'Please add at least one reminder time'**
+  String get addAtLeastOneReminder;
+
+  /// Reminder label
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get reminder;
+
+  /// Delayed status - taken late
+  ///
+  /// In en, this message translates to:
+  /// **'Delayed'**
+  String get delayed;
+
+  /// View all button
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// Quick stats section title
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Stats'**
+  String get quickStats;
+
+  /// Today's medications section
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Medications'**
+  String get todayMedications;
+
+  /// Quick actions section title
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -331,25 +753,25 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'km'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'km'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppLocalizationsEn();
-    case 'km':
-      return AppLocalizationsKm();
+    case 'en': return AppLocalizationsEn();
+    case 'km': return AppLocalizationsKm();
   }
 
   throw FlutterError(
-      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }

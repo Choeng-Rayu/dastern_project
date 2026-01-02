@@ -6,14 +6,17 @@ import 'package:go_router/go_router.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/providers/settings_provider.dart';
 import 'presentation/providers/auth_provider.dart';
+import 'presentation/theme/theme.dart';
 import 'presentation/screens/main_navigation_screen.dart';
 import 'presentation/screens/welcome_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
 import 'presentation/screens/dashboard_screen.dart';
-import 'presentation/screens/medicine_list_screen.dart';
+import 'presentation/screens/medications_screen.dart';
 import 'presentation/screens/medicine_form_screen.dart';
 import 'presentation/screens/profile_screen.dart';
+import 'presentation/screens/intake_history_screen.dart';
+import 'presentation/screens/today_reminders_screen.dart';
 
 /// Main application widget with theming and localization setup
 class DasternApp extends StatelessWidget {
@@ -43,9 +46,9 @@ class DasternApp extends StatelessWidget {
             Locale('km'), // Khmer
           ],
 
-          // Theme configuration
-          theme: _buildLightTheme(),
-          darkTheme: _buildDarkTheme(),
+          // Theme configuration - using centralized AppTheme
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
           themeMode: settings.themeMode,
 
           // Router configuration
@@ -121,7 +124,7 @@ class DasternApp extends StatelessWidget {
               routes: [
                 GoRoute(
                   path: '/medicine-list',
-                  builder: (context, state) => const MedicineListScreen(),
+                  builder: (context, state) => const MedicationsScreen(),
                 ),
               ],
             ),
@@ -143,85 +146,17 @@ class DasternApp extends StatelessWidget {
             ),
           ],
         ),
+
+        // Standalone screens
+        GoRoute(
+          path: '/today-reminders',
+          builder: (context, state) => const TodayRemindersScreen(),
+        ),
+        GoRoute(
+          path: '/intake-history',
+          builder: (context, state) => const IntakeHistoryScreen(),
+        ),
       ],
-    );
-  }
-
-  /// Build light theme with hospital light blue color
-  ThemeData _buildLightTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF4DD0E1), // Light blue/cyan hospital color
-        brightness: Brightness.light,
-      ),
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 2,
-      ),
-      cardTheme: CardTheme(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 2,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        filled: true,
-      ),
-    );
-  }
-
-  /// Build dark theme with hospital light blue color
-  ThemeData _buildDarkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF4DD0E1), // Light blue/cyan hospital color
-        brightness: Brightness.dark,
-      ),
-      appBarTheme: const AppBarTheme(
-        centerTitle: true,
-        elevation: 2,
-      ),
-      cardTheme: CardTheme(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 2,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        filled: true,
-      ),
     );
   }
 }

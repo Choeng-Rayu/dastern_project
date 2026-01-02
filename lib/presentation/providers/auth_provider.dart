@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../services/storage_service.dart';
+import '../../models/patient.dart';
 
 /// Provider to manage authentication state
 class AuthProvider extends ChangeNotifier {
   final StorageService _storageService = StorageService();
 
   bool _isLoggedIn = false;
-  String? _userName;
-  String? _userPhone;
+  Patient? _currentPatient;
   bool _isLoading = true;
 
   bool get isLoggedIn => _isLoggedIn;
-  String? get userName => _userName;
-  String? get userPhone => _userPhone;
+  Patient? get currentPatient => _currentPatient;
+  String? get userName => _currentPatient?.name;
+  String? get userPhone => _currentPatient?.tel;
   bool get isLoading => _isLoading;
 
   /// Initialize auth state from storage
@@ -23,8 +24,7 @@ class AuthProvider extends ChangeNotifier {
     _isLoggedIn = await _storageService.isLoggedIn();
 
     if (_isLoggedIn) {
-      _userName = await _storageService.getUserName();
-      _userPhone = await _storageService.getUserPhone();
+      _currentPatient = await _storageService.getPatientData();
     }
 
     _isLoading = false;
@@ -44,8 +44,7 @@ class AuthProvider extends ChangeNotifier {
 
     if (isValid) {
       _isLoggedIn = true;
-      _userName = await _storageService.getUserName();
-      _userPhone = phone;
+      _currentPatient = await _storageService.getPatientData();
       notifyListeners();
       return true;
     }
@@ -53,21 +52,18 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
-  /// Register new user
+  /// Register new user with complete patient data
   Future<void> register({
-    required String phone,
+    required Patient patient,
     required String password,
-    required String name,
   }) async {
-    await _storageService.saveAuthData(
-      phone: phone,
+    await _storageService.saveUserData(
+      patient: patient,
       password: password,
-      name: name,
     );
 
     _isLoggedIn = true;
-    _userName = name;
-    _userPhone = phone;
+    _currentPatient = patient;
     notifyListeners();
   }
 
@@ -75,8 +71,20 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await _storageService.clearAuthData();
     _isLoggedIn = false;
-    _userName = null;
-    _userPhone = null;
+    _currentPatient = null;
     notifyListeners();
+  }
+
+  /// Update patient data
+  Future<void> updatePatient(Patient patient) async {
+    final password = await _storageService.getPassword();
+    if (password != null) {
+      await _storageService.saveUserData(
+        patient: patient,
+        password: password,
+      );
+      _currentPatient = patient;
+      notifyListeners();
+    }
   }
 }

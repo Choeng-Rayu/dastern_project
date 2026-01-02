@@ -6,8 +6,8 @@ class Patient {
   final DateTime dateOfBirth;
   final String? address;
   final String tel;
-  final String bloodtype;
-  final String familyContact;
+  final String? bloodtype;
+  final String? familyContact;
   final double? weight; // in kg
 
   Patient({
@@ -15,9 +15,9 @@ class Patient {
     required this.tel,
     required this.name,
     this.address,
-    required this.bloodtype,
+    this.bloodtype,
     required this.dateOfBirth,
-    required this.familyContact,
+    this.familyContact,
     this.weight,
   }) : id = id ?? generateId.v4();
 

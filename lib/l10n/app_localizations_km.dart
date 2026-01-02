@@ -1,5 +1,3 @@
-// ignore: unused_import
-import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -118,4 +116,217 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get createAccount => 'បង្កើតគណនីថ្មី';
+
+  @override
+  String get medications => 'ថ្នាំ';
+
+  @override
+  String get addMedication => 'បន្ថែមថ្នាំ';
+
+  @override
+  String get editMedication => 'កែប្រែថ្នាំ';
+
+  @override
+  String get deleteMedication => 'លុបថ្នាំ';
+
+  @override
+  String get deleteMedicationMessage => 'តើអ្នកពិតជាចង់លុបថ្នាំនេះមែនទេ?';
+
+  @override
+  String get medicationDeleted => 'បានលុបថ្នាំជោគជ័យ';
+
+  @override
+  String get medicationAdded => 'បានបន្ថែមថ្នាំជោគជ័យ';
+
+  @override
+  String get medicationUpdated => 'បានកែប្រែថ្នាំជោគជ័យ';
+
+  @override
+  String get medicationName => 'ឈ្មោះថ្នាំ';
+
+  @override
+  String get dosage => 'ប្រមាណប្រើ';
+
+  @override
+  String get amount => 'ចំនួន';
+
+  @override
+  String get unit => 'ឯកតា';
+
+  @override
+  String get tablet => 'គ្រាប់';
+
+  @override
+  String get ml => 'មីលីលីត្រ';
+
+  @override
+  String get mg => 'មីលីក្រាម';
+
+  @override
+  String get other => 'ផ្សេងទៀត';
+
+  @override
+  String get instruction => 'របៀបប្រើប្រាស់';
+
+  @override
+  String get prescribedBy => 'ចេញវេជ្ជបញ្ជាដោយ';
+
+  @override
+  String get reminders => 'ការរំលឹក';
+
+  @override
+  String get autoGenerateReminders => 'បង្កើតការរំលឹក ៣ ដងក្នុងមួយថ្ងៃដោយស្វ័យប្រវត្តិ';
+
+  @override
+  String get remindersGenerated => 'បានបង្កើតការរំលឹកជោគជ័យ';
+
+  @override
+  String get morning => 'ពេលព្រឹក';
+
+  @override
+  String get afternoon => 'ពេលរសៀល';
+
+  @override
+  String get evening => 'ពេលល្ងាច';
+
+  @override
+  String get night => 'ពេលយប់';
+
+  @override
+  String get delete => 'លុប';
+
+  @override
+  String get edit => 'កែប្រែ';
+
+  @override
+  String get enterMedicationName => 'បញ្ចូលឈ្មោះថ្នាំ';
+
+  @override
+  String get enterAmount => 'បញ្ចូលចំនួន';
+
+  @override
+  String get enterInstruction => 'បញ្ចូលរបៀបប្រើប្រាស់';
+
+  @override
+  String get enterPrescriber => 'បញ្ចូលឈ្មោះវេជ្ជបណ្ឌិត';
+
+  @override
+  String get fieldRequired => 'ចាំបាច់បំពេញ';
+
+  @override
+  String get noMedications => 'មិនទាន់មានថ្នាំនៅឡើយទេ';
+
+  @override
+  String get todayReminders => 'ការរំលឹកថ្ងៃនេះ';
+
+  @override
+  String get upcomingReminders => 'នៅសល់';
+
+  @override
+  String get completedReminders => 'បានបញ្ចប់';
+
+  @override
+  String get markAsTaken => 'សម្គាល់ថាបានញ៉ាំ';
+
+  @override
+  String get skip => 'រំលង';
+
+  @override
+  String get taken => 'បានញ៉ាំ';
+
+  @override
+  String get missed => 'ខកខាន';
+
+  @override
+  String get skipped => 'បានរំលង';
+
+  @override
+  String get history => 'ប្រវត្តិ';
+
+  @override
+  String get intakeHistory => 'ប្រវត្តិការប្រើថ្នាំ';
+
+  @override
+  String get adherenceRate => 'អត្រាប្រើប្រាស់ត្រឹមត្រូវ';
+
+  @override
+  String get thisWeek => 'សប្តាហ៍នេះ';
+
+  @override
+  String get thisMonth => 'ខែនេះ';
+
+  @override
+  String get all => 'ទាំងអស់';
+
+  @override
+  String get takenAt => 'បានញ៉ាំនៅ';
+
+  @override
+  String get scheduledFor => 'កំណត់ពេលសម្រាប់';
+
+  @override
+  String get noHistoryYet => 'មិនទាន់មានប្រវត្តិទេ';
+
+  @override
+  String get viewHistory => 'មើលប្រវត្តិ';
+
+  @override
+  String get noRemindersToday => 'គ្មានការរំលឹកសម្រាប់ថ្ងៃនេះ';
+
+  @override
+  String get manageReminders => 'គ្រប់គ្រងការរំលឹក';
+
+  @override
+  String get editReminder => 'កែប្រែការរំលឹក';
+
+  @override
+  String get deleteReminder => 'លុបការរំលឹក';
+
+  @override
+  String get time => 'ពេលវេលា';
+
+  @override
+  String get days => 'ថ្ងៃ';
+
+  @override
+  String get active => 'សកម្ម';
+
+  @override
+  String get inactive => 'អសកម្ម';
+
+  @override
+  String get addTime => 'បន្ថែមពេលវេលា';
+
+  @override
+  String get noRemindersAdded => 'មិនទាន់បានបន្ថែមពេលវេលារំលឹកនៅឡើយទេ។ ចុច \'បន្ថែមពេលវេលា\' ដើម្បីកំណត់កាលវិភាគថ្នាំ។';
+
+  @override
+  String get timeOfDay => 'ពេលវេលាក្នុងថ្ងៃ';
+
+  @override
+  String get dosageAmount => 'ចំនួនប្រើ';
+
+  @override
+  String get activeDays => 'ថ្ងៃសកម្ម';
+
+  @override
+  String get addAtLeastOneReminder => 'សូមបន្ថែមពេលវេលារំលឹកយ៉ាងហោចណាស់មួយ';
+
+  @override
+  String get reminder => 'ការរំលឹក';
+
+  @override
+  String get delayed => 'យឺត';
+
+  @override
+  String get viewAll => 'មើលទាំងអស់';
+
+  @override
+  String get quickStats => 'ស្ថិតិរហ័ស';
+
+  @override
+  String get todayMedications => 'ថ្នាំថ្ងៃនេះ';
+
+  @override
+  String get quickActions => 'សកម្មភាពរហ័ស';
 }
