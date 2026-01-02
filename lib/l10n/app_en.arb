@@ -79,5 +79,33 @@
   "cancel": "Cancel",
   "@cancel": {
     "description": "Cancel button"
+  },
+  "hello": "Hello",
+  "@hello": {
+    "description": "Greeting"
+  },
+  "dateOfBirth": "Date of Birth",
+  "@dateOfBirth": {
+    "description": "Date of birth label"
+  },
+  "todaySchedule": "Schedule (Today)",
+  "@todaySchedule": {
+    "description": "Today's schedule title"
+  },
+  "dose": "dose",
+  "@dose": {
+    "description": "Dose/pill label"
+  },
+  "patient": "Patient",
+  "@patient": {
+    "description": "Patient label"
+  },
+  "completed": "Completed",
+  "@completed": {
+    "description": "Completed status"
+  },
+  "pending": "Pending",
+  "@pending": {
+    "description": "Pending status"
   }
 }

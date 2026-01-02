@@ -27,7 +27,7 @@ class MainNavigationScreen extends StatelessWidget {
           );
         },
         backgroundColor: Colors.white,
-        indicatorColor: const Color(0xFF4DD0E1).withValues(alpha: 0.3),
+        indicatorColor: Color(0xFF4DD0E1).withOpacity(0.3),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),
