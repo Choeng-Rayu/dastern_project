@@ -15,6 +15,7 @@ void main() async {
 
   // Initialize notification service
   final notificationService = NotificationService();
+  await notificationService.initialize();
 
   // Initialize settings provider
   final settingsProvider = SettingsProvider();
@@ -38,11 +39,16 @@ void main() async {
 
   // Schedule today's reminders
   if (authProvider.currentPatient != null) {
+    debugPrint(
+        '📱 [Main] Scheduling today\'s reminders for user: ${authProvider.currentPatient!.tel}');
     final todayReminders = reminderProvider.getTodayReminders();
+    debugPrint('📱 [Main] Found ${todayReminders.length} reminders for today');
     await notificationService.scheduleRemindersForToday(
       reminders: todayReminders,
       medications: medicationProvider.medications,
     );
+  } else {
+    debugPrint('📱 [Main] No user logged in, skipping reminder scheduling');
   }
 
   runApp(

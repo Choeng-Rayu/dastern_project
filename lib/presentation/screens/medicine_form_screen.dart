@@ -5,6 +5,7 @@ import '../providers/medication_provider.dart';
 import '../providers/reminder_provider.dart';
 import '../../models/medication.dart';
 import '../../models/reminder.dart';
+import '../../services/notification_service.dart';
 
 /// Medicine Form screen - Create new medication with custom reminder times
 class MedicineFormScreen extends StatefulWidget {
@@ -145,7 +146,9 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
 
       await medicationProvider.addMedication(newMedication);
 
-      // Create reminders with custom times
+      final notificationService = Provider.of<NotificationService>(context, listen: false);
+
+      // Create reminders with custom times and schedule notifications
       for (final reminderTime in _reminderTimes) {
         final now = DateTime.now();
         final reminderDateTime = DateTime(
@@ -166,6 +169,18 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         );
 
         await reminderProvider.addReminder(reminder);
+
+        // Schedule notification for this reminder if it's for today
+        if (reminder.shouldFireToday() && reminderDateTime.isAfter(now)) {
+          await notificationService.scheduleReminder(
+            id: reminder.id,
+            medicationName: newMedication.name,
+            scheduledTime: reminderDateTime,
+            dosageInfo:
+                '${reminderTime.dosageAmount} ${_getUnitString(newMedication.dosage.unit)}',
+            medicationId: newMedication.id,
+          );
+        }
       }
 
       if (mounted) {
@@ -387,9 +402,9 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                         const SizedBox(height: 24),
 
                         // Color picker
-                        Text(
+                        const Text(
                           'Color',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -436,9 +451,9 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                         const SizedBox(height: 24),
 
                         // Icon picker
-                        Text(
+                        const Text(
                           'Icon',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -773,6 +788,19 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         return 'Sat';
       case WeekDay.sunday:
         return 'Sun';
+    }
+  }
+
+  String _getUnitString(Unit unit) {
+    switch (unit) {
+      case Unit.tablet:
+        return 'tablet';
+      case Unit.ml:
+        return 'ml';
+      case Unit.mg:
+        return 'mg';
+      case Unit.other:
+        return 'other';
     }
   }
 }
