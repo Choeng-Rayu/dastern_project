@@ -5,7 +5,11 @@ import 'package:go_router/go_router.dart';
 
 import 'l10n/app_localizations.dart';
 import 'presentation/providers/settings_provider.dart';
+import 'presentation/providers/auth_provider.dart';
 import 'presentation/screens/main_navigation_screen.dart';
+import 'presentation/screens/welcome_screen.dart';
+import 'presentation/screens/login_screen.dart';
+import 'presentation/screens/register_screen.dart';
 import 'presentation/screens/dashboard_screen.dart';
 import 'presentation/screens/medicine_list_screen.dart';
 import 'presentation/screens/medicine_form_screen.dart';
@@ -17,9 +21,9 @@ class DasternApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
-        final router = _createRouter();
+    return Consumer2<SettingsProvider, AuthProvider>(
+      builder: (context, settings, auth, child) {
+        final router = _createRouter(auth);
 
         return MaterialApp.router(
           // Application metadata
@@ -52,10 +56,54 @@ class DasternApp extends StatelessWidget {
   }
 
   /// Create GoRouter configuration
-  GoRouter _createRouter() {
+  GoRouter _createRouter(AuthProvider authProvider) {
     return GoRouter(
-      initialLocation: '/dashboard',
+      initialLocation: '/',
+      redirect: (context, state) {
+        final isLoggedIn = authProvider.isLoggedIn;
+        final isLoading = authProvider.isLoading;
+
+        // Wait for auth to initialize
+        if (isLoading) {
+          return null;
+        }
+
+        final isAuthRoute = state.matchedLocation == '/' ||
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/register';
+
+        // If not logged in and trying to access protected route, redirect to welcome
+        if (!isLoggedIn && !isAuthRoute) {
+          return '/';
+        }
+
+        // If logged in and on auth route, redirect to dashboard
+        if (isLoggedIn && isAuthRoute) {
+          return '/dashboard';
+        }
+
+        return null;
+      },
       routes: [
+        // Welcome Screen
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const WelcomeScreen(),
+        ),
+
+        // Login Screen
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+
+        // Register Screen
+        GoRoute(
+          path: '/register',
+          builder: (context, state) => const RegisterScreen(),
+        ),
+
+        // Main App Navigation (Dashboard, Medicine List, etc.)
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
             return MainNavigationScreen(navigationShell: navigationShell);
