@@ -107,5 +107,45 @@
   "pending": "Pending",
   "@pending": {
     "description": "Pending status"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button"
+  },
+  "register": "Register",
+  "@register": {
+    "description": "Register button"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button"
+  },
+  "logoutConfirmation": "Are you sure you want to logout?",
+  "@logoutConfirmation": {
+    "description": "Logout confirmation message"
+  },
+  "phoneNumber": "Phone Number",
+  "@phoneNumber": {
+    "description": "Phone number label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password label"
+  },
+  "loginError": "Invalid phone number or password",
+  "@loginError": {
+    "description": "Login error message"
+  },
+  "registerSuccess": "Registration successful!",
+  "@registerSuccess": {
+    "description": "Registration success message"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Welcome back message on login"
+  },
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account message"
   }
 }

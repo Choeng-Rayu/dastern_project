@@ -67,4 +67,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get hello => 'Hello';
+
+  @override
+  String get dateOfBirth => 'Date of Birth';
+
+  @override
+  String get todaySchedule => 'Schedule (Today)';
+
+  @override
+  String get dose => 'dose';
+
+  @override
+  String get patient => 'Patient';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get logoutConfirmation => 'Are you sure you want to logout?';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get loginError => 'Invalid phone number or password';
+
+  @override
+  String get registerSuccess => 'Registration successful!';
+
+  @override
+  String get welcomeBack => 'Welcome Back';
+
+  @override
+  String get createAccount => 'Create Account';
 }

@@ -217,6 +217,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// Greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Hello'**
+  String get hello;
+
+  /// Date of birth label
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get dateOfBirth;
+
+  /// Today's schedule title
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule (Today)'**
+  String get todaySchedule;
+
+  /// Dose/pill label
+  ///
+  /// In en, this message translates to:
+  /// **'dose'**
+  String get dose;
+
+  /// Patient label
+  ///
+  /// In en, this message translates to:
+  /// **'Patient'**
+  String get patient;
+
+  /// Completed status
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// Pending status
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// Login button
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// Register button
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// Logout button
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// Logout confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get logoutConfirmation;
+
+  /// Phone number label
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// Password label
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// Login error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid phone number or password'**
+  String get loginError;
+
+  /// Registration success message
+  ///
+  /// In en, this message translates to:
+  /// **'Registration successful!'**
+  String get registerSuccess;
+
+  /// Welcome back message on login
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get welcomeBack;
+
+  /// Create account message
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get createAccount;
 }
 
 class _AppLocalizationsDelegate

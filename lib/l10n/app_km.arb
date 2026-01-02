@@ -26,5 +26,15 @@
   "dose": "ដុំ",
   "patient": "អ្នកជំងឺ",
   "completed": "បានបញ្ចប់",
-  "pending": "រងចាំ"
+  "pending": "រងចាំ",
+  "login": "ចូលប្រើ",
+  "register": "ចុះឈ្មោះ",
+  "logout": "ចាកចេញ",
+  "logoutConfirmation": "តើអ្នកពិតជាចង់ចាកចេញមែនទេ?",
+  "phoneNumber": "លេខទូរស័ព្ទ",
+  "password": "ពាក្យសម្ងាត់",
+  "loginError": "លេខទូរស័ព្ទ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ",
+  "registerSuccess": "ចុះឈ្មោះបានជោគជ័យ!",
+  "welcomeBack": "សូមស្វាគមន៍ត្រលប់មកវិញ",
+  "createAccount": "បង្កើតគណនីថ្មី"
 }
