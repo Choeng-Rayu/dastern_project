@@ -431,5 +431,105 @@
   "quickActions": "Quick Actions",
   "@quickActions": {
     "description": "Quick actions section title"
+  },
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name label"
+  },
+  "selectDateOfBirth": "Select date of birth",
+  "@selectDateOfBirth": {
+    "description": "Date of birth placeholder"
+  },
+  "bloodType": "Blood Type",
+  "@bloodType": {
+    "description": "Blood type label"
+  },
+  "familyContact": "Family Contact",
+  "@familyContact": {
+    "description": "Family contact label"
+  },
+  "weight": "Weight (kg)",
+  "@weight": {
+    "description": "Weight label"
+  },
+  "address": "Address (Optional)",
+  "@address": {
+    "description": "Address label"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password label"
+  },
+  "passwordMismatch": "Passwords do not match",
+  "@passwordMismatch": {
+    "description": "Password mismatch error"
+  },
+  "passwordTooShort": "Password must be at least 6 characters",
+  "@passwordTooShort": {
+    "description": "Password length error"
+  },
+  "pleaseEnterPhone": "Please enter phone number",
+  "@pleaseEnterPhone": {
+    "description": "Phone required error"
+  },
+  "phoneInvalid": "Invalid phone number",
+  "@phoneInvalid": {
+    "description": "Phone invalid error"
+  },
+  "pleaseEnterPassword": "Please enter password",
+  "@pleaseEnterPassword": {
+    "description": "Password required error"
+  },
+  "pleaseEnterName": "Please enter name",
+  "@pleaseEnterName": {
+    "description": "Name required error"
+  },
+  "pleaseSelectDateOfBirth": "Please select date of birth",
+  "@pleaseSelectDateOfBirth": {
+    "description": "Date of birth required error"
+  },
+  "pleaseSelectBloodType": "Please select blood type",
+  "@pleaseSelectBloodType": {
+    "description": "Blood type required error"
+  },
+  "pleaseEnterFamilyContact": "Please enter family contact",
+  "@pleaseEnterFamilyContact": {
+    "description": "Family contact required error"
+  },
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link"
+  },
+  "dontHaveAccount": "Don't have an account? ",
+  "@dontHaveAccount": {
+    "description": "Don't have account text"
+  },
+  "alreadyHaveAccount": "Already have an account? ",
+  "@alreadyHaveAccount": {
+    "description": "Already have account text"
+  },
+  "enterPhoneHint": "012345678",
+  "@enterPhoneHint": {
+    "description": "Phone number hint"
+  },
+  "enterPasswordHint": "••••••••",
+  "@enterPasswordHint": {
+    "description": "Password hint"
+  },
+  "enterNameHint": "Kimhour",
+  "@enterNameHint": {
+    "description": "Name hint"
+  },
+  "enterFamilyContactHint": "098765432",
+  "@enterFamilyContactHint": {
+    "description": "Family contact hint"
+  },
+  "enterWeightHint": "60.0",
+  "@enterWeightHint": {
+    "description": "Weight hint"
+  },
+  "enterAddressHint": "Street, District, Province",
+  "@enterAddressHint": {
+    "description": "Address hint"
   }
 }

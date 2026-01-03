@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import '/l10n/app_localizations.dart';
-import '/models/intakeHistory.dart';
-import '/models/medication.dart';
+import '../../l10n/app_localizations.dart';
+import '../../models/intakeHistory.dart';
+import '../../models/medication.dart';
 import '../providers/auth_provider.dart';
 import '../providers/medication_provider.dart';
 import '../providers/reminder_provider.dart';
 import '../providers/intake_history_provider.dart';
 import '../layout/app_layout.dart';
 import '../theme/theme.dart';
+import '../widget/gradient_background.dart';
 
 /// Dashboard screen - Main hub with real-time medication data
 class DashboardScreen extends StatefulWidget {
@@ -46,22 +47,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: isDarkMode
-                ? [
-                    const Color(0xFF1A3A3F),
-                    const Color(0xFF0D2026),
-                  ]
-                : [
-                    AppTheme.primaryColor,
-                    AppTheme.primaryDark,
-                  ],
-          ),
-        ),
+      body: GradientBackground(
+        isDarkMode: isDarkMode,
         child: SafeArea(
           child: RefreshIndicator(
             onRefresh: _generateTodayIntakes,
@@ -697,7 +684,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case IntakeStatus.skipped:
         return AppTheme.skippedColor;
       case IntakeStatus.pending:
-      default:
         return AppTheme.pendingColor;
     }
   }

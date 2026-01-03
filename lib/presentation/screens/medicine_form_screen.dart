@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/medication_provider.dart';
 import '../providers/reminder_provider.dart';
 import '../../models/medication.dart';
 import '../../models/reminder.dart';
 import '../../services/notification_service.dart';
+import '../widget/gradient_background.dart';
 
 /// Medicine Form screen - Create new medication with custom reminder times
 class MedicineFormScreen extends StatefulWidget {
-  const MedicineFormScreen({super.key});
+  final Medication? medication;
+
+  const MedicineFormScreen({super.key, this.medication});
 
   @override
   State<MedicineFormScreen> createState() => _MedicineFormScreenState();
@@ -68,6 +71,40 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
     Icons.science,
     Icons.colorize,
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.medication != null) {
+      // Pre-populate form for edit mode
+      _nameController.text = widget.medication!.name;
+      _amountController.text = widget.medication!.dosage.amount.toString();
+      _selectedUnit = widget.medication!.dosage.unit;
+      _instructionController.text = widget.medication!.instruction;
+      _prescriberController.text = widget.medication!.prescribeBy;
+      _selectedColor = widget.medication!.color ?? const Color(0xFF4DD0E1);
+      _selectedIcon = widget.medication!.icon ?? Icons.medication;
+
+      // Load existing reminders
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final reminderProvider =
+            Provider.of<ReminderProvider>(context, listen: false);
+        final existingReminders =
+            reminderProvider.getRemindersForMedication(widget.medication!.id);
+
+        setState(() {
+          _reminderTimes = existingReminders.map((reminder) {
+            return ReminderTime(
+              time: TimeOfDay.fromDateTime(reminder.time),
+              timeOfDay: reminder.timeOfDay,
+              activeDays: reminder.activeDays,
+              dosageAmount: reminder.dosageAmount,
+            );
+          }).toList();
+        });
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -134,19 +171,39 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         unit: _selectedUnit,
       );
 
-      // Create new medication
-      final newMedication = Medication(
-        name: _nameController.text.trim(),
-        dosage: dosage,
-        instruction: _instructionController.text.trim(),
-        prescribeBy: _prescriberController.text.trim(),
-        color: _selectedColor,
-        icon: _selectedIcon,
-      );
+      final isEditing = widget.medication != null;
+      final Medication medication;
 
-      await medicationProvider.addMedication(newMedication);
+      if (isEditing) {
+        // Update existing medication
+        medication = widget.medication!.copyWith(
+          name: _nameController.text.trim(),
+          dosage: dosage,
+          instruction: _instructionController.text.trim(),
+          prescribeBy: _prescriberController.text.trim(),
+          color: _selectedColor,
+          icon: _selectedIcon,
+        );
+        await medicationProvider.updateMedication(medication);
 
-      final notificationService = Provider.of<NotificationService>(context, listen: false);
+        // Delete old reminders before creating new ones
+        await reminderProvider.deleteRemindersForMedication(medication.id);
+      } else {
+        // Create new medication
+        medication = Medication(
+          name: _nameController.text.trim(),
+          dosage: dosage,
+          instruction: _instructionController.text.trim(),
+          prescribeBy: _prescriberController.text.trim(),
+          color: _selectedColor,
+          icon: _selectedIcon,
+        );
+        await medicationProvider.addMedication(medication);
+      }
+
+      if (!context.mounted) return;
+      final notificationService =
+          Provider.of<NotificationService>(context, listen: false);
 
       // Create reminders with custom times and schedule notifications
       for (final reminderTime in _reminderTimes) {
@@ -160,7 +217,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         );
 
         final reminder = Reminder(
-          medicationId: newMedication.id,
+          medicationId: medication.id,
           time: reminderDateTime,
           dosageAmount: reminderTime.dosageAmount,
           timeOfDay: reminderTime.timeOfDay,
@@ -174,11 +231,11 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         if (reminder.shouldFireToday() && reminderDateTime.isAfter(now)) {
           await notificationService.scheduleReminder(
             id: reminder.id,
-            medicationName: newMedication.name,
+            medicationName: medication.name,
             scheduledTime: reminderDateTime,
             dosageInfo:
-                '${reminderTime.dosageAmount} ${_getUnitString(newMedication.dosage.unit)}',
-            medicationId: newMedication.id,
+                '${reminderTime.dosageAmount} ${_getUnitString(medication.dosage.unit)}',
+            medicationId: medication.id,
           );
         }
       }
@@ -190,21 +247,27 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.medicationAdded),
+            content:
+                Text(isEditing ? l10n.medicationUpdated : l10n.medicationAdded),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 2),
           ),
         );
 
-        // Clear form
-        _nameController.clear();
-        _amountController.clear();
-        _instructionController.clear();
-        _prescriberController.clear();
-        setState(() {
-          _selectedUnit = Unit.tablet;
-          _reminderTimes.clear();
-        });
+        if (isEditing) {
+          // Pop back to previous screen after editing
+          Navigator.pop(context);
+        } else {
+          // Clear form for next entry when adding
+          _nameController.clear();
+          _amountController.clear();
+          _instructionController.clear();
+          _prescriberController.clear();
+          setState(() {
+            _selectedUnit = Unit.tablet;
+            _reminderTimes.clear();
+          });
+        }
       }
     }
   }
@@ -212,10 +275,13 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF4DD0E1),
-      body: SafeArea(
+        body: GradientBackground(
+      isDarkMode: isDark,
+      child: SafeArea(
         child: Column(
           children: [
             // Header
@@ -223,11 +289,16 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Row(
                 children: [
-                  const Icon(Icons.add_circle_outline,
-                      color: Colors.white, size: 32),
+                  if (widget.medication == null)
+                    const Icon(Icons.add_circle_outline,
+                        color: Colors.white, size: 32)
+                  else
+                    const Icon(Icons.edit, color: Colors.white, size: 32),
                   const SizedBox(width: 12),
                   Text(
-                    l10n.addMedication,
+                    widget.medication == null
+                        ? l10n.addMedication
+                        : l10n.editMedication,
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -241,9 +312,11 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
             // Form
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF1E1E1E)
+                      : theme.scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(32),
                     topRight: Radius.circular(32),
                   ),
@@ -258,15 +331,31 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                         // Medication name
                         TextFormField(
                           controller: _nameController,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
                           decoration: InputDecoration(
                             labelText: l10n.medicationName,
                             hintText: l10n.enterMedicationName,
-                            prefixIcon: const Icon(Icons.medication),
+                            prefixIcon: Icon(
+                              Icons.medication,
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                            labelStyle: TextStyle(
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[700],
+                            ),
+                            hintStyle: TextStyle(
+                              color:
+                                  isDark ? Colors.grey[600] : Colors.grey[400],
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor:
+                                isDark ? Colors.grey[800] : Colors.grey[50],
                           ),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -295,18 +384,38 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                               flex: 2,
                               child: TextFormField(
                                 controller: _amountController,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                         decimal: true),
                                 decoration: InputDecoration(
                                   labelText: l10n.amount,
                                   hintText: l10n.enterAmount,
-                                  prefixIcon: const Icon(Icons.numbers),
+                                  prefixIcon: Icon(
+                                    Icons.numbers,
+                                    color: isDark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[600],
+                                  ),
+                                  labelStyle: TextStyle(
+                                    color: isDark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[700],
+                                  ),
+                                  hintStyle: TextStyle(
+                                    color: isDark
+                                        ? Colors.grey[600]
+                                        : Colors.grey[400],
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[50],
+                                  fillColor: isDark
+                                      ? Colors.grey[800]
+                                      : Colors.grey[50],
                                 ),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
@@ -325,14 +434,26 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                             Expanded(
                               flex: 3,
                               child: DropdownButtonFormField<Unit>(
-                                value: _selectedUnit,
+                                initialValue: _selectedUnit,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                                dropdownColor:
+                                    isDark ? Colors.grey[800] : Colors.white,
                                 decoration: InputDecoration(
                                   labelText: l10n.unit,
+                                  labelStyle: TextStyle(
+                                    color: isDark
+                                        ? Colors.grey[400]
+                                        : Colors.grey[700],
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[50],
+                                  fillColor: isDark
+                                      ? Colors.grey[800]
+                                      : Colors.grey[50],
                                 ),
                                 items: [
                                   DropdownMenuItem(
@@ -370,15 +491,31 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                         TextFormField(
                           controller: _instructionController,
                           maxLines: 3,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
                           decoration: InputDecoration(
                             labelText: l10n.instruction,
                             hintText: l10n.enterInstruction,
-                            prefixIcon: const Icon(Icons.info_outline),
+                            prefixIcon: Icon(
+                              Icons.info_outline,
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                            labelStyle: TextStyle(
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[700],
+                            ),
+                            hintStyle: TextStyle(
+                              color:
+                                  isDark ? Colors.grey[600] : Colors.grey[400],
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor:
+                                isDark ? Colors.grey[800] : Colors.grey[50],
                           ),
                         ),
 
@@ -387,15 +524,31 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                         // Prescribed by
                         TextFormField(
                           controller: _prescriberController,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
                           decoration: InputDecoration(
                             labelText: l10n.prescribedBy,
                             hintText: l10n.enterPrescriber,
-                            prefixIcon: const Icon(Icons.person_outline),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[600],
+                            ),
+                            labelStyle: TextStyle(
+                              color:
+                                  isDark ? Colors.grey[400] : Colors.grey[700],
+                            ),
+                            hintStyle: TextStyle(
+                              color:
+                                  isDark ? Colors.grey[600] : Colors.grey[400],
+                            ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             filled: true,
-                            fillColor: Colors.grey[50],
+                            fillColor:
+                                isDark ? Colors.grey[800] : Colors.grey[50],
                           ),
                         ),
 
@@ -620,7 +773,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                     // Time of day dropdown
                                     DropdownButtonFormField<
                                         MedicationTimeOfDay>(
-                                      value: reminderTime.timeOfDay,
+                                      initialValue: reminderTime.timeOfDay,
                                       decoration: InputDecoration(
                                         labelText: l10n.timeOfDay,
                                         border: OutlineInputBorder(
@@ -733,8 +886,8 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _saveMedication,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4DD0E1),
-                              foregroundColor: Colors.white,
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -744,7 +897,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                 ? const SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: CircularProgressIndicator(
+                                    child: const CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         Colors.white,
@@ -769,7 +922,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   String _getDayAbbreviation(WeekDay day) {

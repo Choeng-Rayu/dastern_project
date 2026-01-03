@@ -19,7 +19,7 @@ import 'presentation/screens/medicine_form_screen.dart';
 import 'presentation/screens/profile_screen.dart';
 import 'presentation/screens/intake_history_screen.dart';
 import 'presentation/screens/today_reminders_screen.dart';
-import 'presentation/widgets/in_app_notification.dart';
+import 'presentation/widget/in_app_notification.dart';
 
 /// Main application widget with theming and localization setup
 class DasternApp extends StatefulWidget {

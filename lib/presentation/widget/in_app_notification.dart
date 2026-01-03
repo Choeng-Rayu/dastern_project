@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/medication_provider.dart';
 import '../providers/intake_history_provider.dart';
 import '../../models/intakeHistory.dart';

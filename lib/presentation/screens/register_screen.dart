@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../../models/patient.dart';
 
@@ -63,7 +63,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             colorScheme: const ColorScheme.light(
               primary: Color(0xFF4DD0E1),
               onPrimary: Colors.white,
-              onSurface: Colors.black,
+              onSurface: Color.fromARGB(255, 102, 91, 91),
             ),
           ),
           child: child!,
@@ -82,8 +82,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       if (_selectedDateOfBirth == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('សូមជ្រើសរើសថ្ងៃខែឆ្នាំកំណើត'),
+          SnackBar(
+            content:
+                Text(AppLocalizations.of(context)!.pleaseSelectDateOfBirth),
             backgroundColor: Colors.red,
           ),
         );
@@ -92,8 +93,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (_selectedBloodType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('សូមជ្រើសរើសក្រុមឈាម'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.pleaseSelectBloodType),
             backgroundColor: Colors.red,
           ),
         );
@@ -149,349 +150,424 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF4DD0E1),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    padding: EdgeInsets.zero,
-                    alignment: Alignment.centerLeft,
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'ចុះឈ្មោះ',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'បង្កើតគណនីថ្មី',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
-            // Form
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
+    return Scaffold(
+        backgroundColor: const Color(0xFF4DD0E1),
+        body: SafeArea(
+          child:
+              // Header
+              Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconButton(
+                  onPressed: () => context.pop(),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.centerLeft,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  l10n.register,
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Name field
-                        _buildTextField(
-                          controller: _nameController,
-                          label: 'ឈ្មោះពេញ',
-                          hint: 'សុខជាត',
-                          icon: Icons.person,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ចូលឈ្មោះ';
-                            }
-                            return null;
-                          },
-                        ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.createAccount,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
 
-                        const SizedBox(height: 16),
+                const SizedBox(height: 40),
 
-                        // Date of Birth
-                        InkWell(
-                          onTap: _selectDateOfBirth,
-                          child: InputDecorator(
-                            decoration: InputDecoration(
-                              labelText: 'ថ្ងៃខែឆ្នាំកំណើត',
-                              prefixIcon: const Icon(Icons.calendar_today),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
-                            child: Text(
-                              _selectedDateOfBirth != null
-                                  ? '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'
-                                  : 'ជ្រើសរើសថ្ងៃខែឆ្នាំកំណើត',
-                              style: TextStyle(
-                                color: _selectedDateOfBirth != null
-                                    ? Colors.black87
-                                    : Colors.grey[600],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Blood Type
-                        DropdownButtonFormField<String>(
-                          value: _selectedBloodType,
-                          decoration: InputDecoration(
-                            labelText: 'ក្រុមឈាម',
-                            prefixIcon: const Icon(Icons.bloodtype),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                          ),
-                          items: _bloodTypes
-                              .map((type) => DropdownMenuItem(
-                                    value: type,
-                                    child: Text(type),
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedBloodType = value;
-                            });
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Phone number
-                        _buildTextField(
-                          controller: _phoneController,
-                          label: 'លេខទូរស័ព្ទ',
-                          hint: '012345678',
-                          icon: Icons.phone,
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ចូលលេខទូរស័ព្ទ';
-                            }
-                            if (value.length < 8) {
-                              return 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Family contact
-                        _buildTextField(
-                          controller: _familyContactController,
-                          label: 'លេខទូរស័ព្ទគ្រួសារ',
-                          hint: '098765432',
-                          icon: Icons.family_restroom,
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ចូលលេខទូរស័ព្ទគ្រួសារ';
-                            }
-                            if (value.length < 8) {
-                              return 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Weight (optional)
-                        _buildTextField(
-                          label: 'ទម្ងន់ (kg)',
-                          hint: '23.0',
-                          icon: Icons.monitor_weight,
-                          keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            setState(() {
-                              _weight = double.tryParse(value);
-                            });
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Address (optional)
-                        _buildTextField(
-                          controller: _addressController,
-                          label: 'អាសយដ្ឋាន (ស្រេចចិត្ត)',
-                          hint: 'ភូមិ កុម សង្កាត់',
-                          icon: Icons.location_on,
-                          maxLines: 2,
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Password
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            labelText: 'ពាក្យសម្ងាត់',
-                            hintText: '••••••••',
-                            prefixIcon: const Icon(Icons.lock),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
+                // Form
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(32),
+                        topRight: Radius.circular(32),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Name field
+                            _buildTextField(
+                              controller: _nameController,
+                              label: l10n.fullName,
+                              hint: l10n.enterNameHint,
+                              icon: Icons.person,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.pleaseEnterName;
+                                }
+                                return null;
                               },
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ចូលពាក្យសម្ងាត់';
-                            }
-                            if (value.length < 6) {
-                              return 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួ';
-                            }
-                            return null;
-                          },
-                        ),
 
-                        const SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
-                        // Confirm Password
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          obscureText: _obscureConfirmPassword,
-                          decoration: InputDecoration(
-                            labelText: 'បញ្ជាក់ពាក្យសម្ងាត់',
-                            hintText: '••••••••',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ជាក់ពាក្យសម្ងាត់';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'ពាក្យសម្ងាត់មិនត្រូវគ្នា';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // Register button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleRegister,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4DD0E1),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : const Text(
-                                    'ចុះឈ្មោះ',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                            // Date of Birth
+                            InkWell(
+                              onTap: _selectDateOfBirth,
+                              child: InputDecorator(
+                                decoration: InputDecoration(
+                                  labelText: l10n.dateOfBirth,
+                                  labelStyle:
+                                      const TextStyle(color: Colors.black54),
+                                  prefixIcon: const Icon(Icons.calendar_today,
+                                      color: Colors.black54),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black12),
                                   ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Login link
-                        Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'មានគណនីរួចហើយ? ',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  context.pushReplacement('/login');
-                                },
-                                child: const Text(
-                                  'ចូលប្រើ',
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        const BorderSide(color: Colors.black12),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                        color: Color(0xFF4DD0E1), width: 2),
+                                  ),
+                                ),
+                                child: Text(
+                                  _selectedDateOfBirth != null
+                                      ? '${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.year}'
+                                      : l10n.selectDateOfBirth,
                                   style: TextStyle(
-                                    color: Color(0xFF4DD0E1),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    color: _selectedDateOfBirth != null
+                                        ? Colors.black87
+                                        : Colors.grey[600],
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Blood Type
+                            DropdownButtonFormField<String>(
+                              initialValue: _selectedBloodType,
+                              style: const TextStyle(color: Colors.black87),
+                              dropdownColor: Colors.white,
+                              decoration: InputDecoration(
+                                labelText: l10n.bloodType,
+                                labelStyle:
+                                    const TextStyle(color: Colors.black54),
+                                prefixIcon: const Icon(Icons.bloodtype,
+                                    color: Colors.black54),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black12),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF4DD0E1), width: 2),
+                                ),
+                              ),
+                              items: _bloodTypes
+                                  .map((type) => DropdownMenuItem(
+                                        value: type,
+                                        child: Text(type),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedBloodType = value;
+                                });
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Phone number
+                            _buildTextField(
+                              controller: _phoneController,
+                              label: l10n.phoneNumber,
+                              hint: l10n.enterPhoneHint,
+                              icon: Icons.phone,
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.pleaseEnterPhone;
+                                }
+                                if (value.length < 8) {
+                                  return l10n.phoneInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Family contact
+                            _buildTextField(
+                              controller: _familyContactController,
+                              label: l10n.familyContact,
+                              hint: l10n.enterFamilyContactHint,
+                              icon: Icons.family_restroom,
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.pleaseEnterFamilyContact;
+                                }
+                                if (value.length < 8) {
+                                  return l10n.phoneInvalid;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Weight (optional)
+                            _buildTextField(
+                              label: l10n.weight,
+                              hint: l10n.enterWeightHint,
+                              icon: Icons.monitor_weight,
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                setState(() {
+                                  _weight = double.tryParse(value);
+                                });
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Address (optional)
+                            _buildTextField(
+                              controller: _addressController,
+                              label: l10n.address,
+                              hint: l10n.enterAddressHint,
+                              icon: Icons.location_on,
+                              maxLines: 2,
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Password
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(color: Colors.black87),
+                              decoration: InputDecoration(
+                                labelText: l10n.password,
+                                hintText: l10n.enterPasswordHint,
+                                labelStyle:
+                                    const TextStyle(color: Colors.black54),
+                                hintStyle:
+                                    const TextStyle(color: Colors.black38),
+                                prefixIcon: const Icon(Icons.lock,
+                                    color: Colors.black54),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.black54,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black12),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF4DD0E1), width: 2),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.pleaseEnterPassword;
+                                }
+                                if (value.length < 6) {
+                                  return l10n.passwordTooShort;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Confirm Password
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              obscureText: _obscureConfirmPassword,
+                              style: const TextStyle(color: Colors.black87),
+                              decoration: InputDecoration(
+                                labelText: l10n.confirmPassword,
+                                hintText: l10n.enterPasswordHint,
+                                labelStyle:
+                                    const TextStyle(color: Colors.black54),
+                                hintStyle:
+                                    const TextStyle(color: Colors.black38),
+                                prefixIcon: const Icon(Icons.lock_outline,
+                                    color: Colors.black54),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: Colors.black54,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black12),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide:
+                                      const BorderSide(color: Colors.black12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF4DD0E1), width: 2),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return l10n.pleaseEnterPassword;
+                                }
+                                if (value != _passwordController.text) {
+                                  return l10n.passwordMismatch;
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 32),
+
+                            // Register button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _handleRegister,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4DD0E1),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                            Colors.white,
+                                          ),
+                                        ),
+                                      )
+                                    : Text(
+                                        l10n.register,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Login link
+                            Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    l10n.alreadyHaveAccount,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      context.pushReplacement('/login');
+                                    },
+                                    child: Text(
+                                      l10n.login,
+                                      style: const TextStyle(
+                                        color: Color(0xFF4DD0E1),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget _buildTextField({
@@ -508,15 +584,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
+      style: const TextStyle(color: Colors.black87),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon),
+        labelStyle: const TextStyle(color: Colors.black54),
+        hintStyle: const TextStyle(color: Colors.black38),
+        prefixIcon: Icon(icon, color: Colors.black54),
+        filled: true,
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black12),
         ),
-        filled: true,
-        fillColor: Colors.grey[50],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF4DD0E1), width: 2),
+        ),
       ),
       validator: validator,
       onChanged: onChanged,

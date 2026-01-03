@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -175,7 +177,8 @@ class AppLocalizationsKm extends AppLocalizations {
   String get reminders => 'ការរំលឹក';
 
   @override
-  String get autoGenerateReminders => 'បង្កើតការរំលឹក ៣ ដងក្នុងមួយថ្ងៃដោយស្វ័យប្រវត្តិ';
+  String get autoGenerateReminders =>
+      'បង្កើតការរំលឹក ៣ ដងក្នុងមួយថ្ងៃដោយស្វ័យប្រវត្តិ';
 
   @override
   String get remindersGenerated => 'បានបង្កើតការរំលឹកជោគជ័យ';
@@ -298,7 +301,8 @@ class AppLocalizationsKm extends AppLocalizations {
   String get addTime => 'បន្ថែមពេលវេលា';
 
   @override
-  String get noRemindersAdded => 'មិនទាន់បានបន្ថែមពេលវេលារំលឹកនៅឡើយទេ។ ចុច \'បន្ថែមពេលវេលា\' ដើម្បីកំណត់កាលវិភាគថ្នាំ។';
+  String get noRemindersAdded =>
+      'មិនទាន់បានបន្ថែមពេលវេលារំលឹកនៅឡើយទេ។ ចុច \'បន្ថែមពេលវេលា\' ដើម្បីកំណត់កាលវិភាគថ្នាំ។';
 
   @override
   String get timeOfDay => 'ពេលវេលាក្នុងថ្ងៃ';
@@ -329,4 +333,79 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get quickActions => 'សកម្មភាពរហ័ស';
+
+  @override
+  String get fullName => 'ឈ្មោះពេញ';
+
+  @override
+  String get selectDateOfBirth => 'ជ្រើសរើសថ្ងៃខែឆ្នាំកំណើត';
+
+  @override
+  String get bloodType => 'ក្រុមឈាម';
+
+  @override
+  String get familyContact => 'លេខទូរស័ព្ទគ្រួសារ';
+
+  @override
+  String get weight => 'ទម្ងន់ (kg)';
+
+  @override
+  String get address => 'អាសយដ្ឋាន (ស្រេចចិត្ត)';
+
+  @override
+  String get confirmPassword => 'បញ្ជាក់ពាក្យសម្ងាត់';
+
+  @override
+  String get passwordMismatch => 'ពាក្យសម្ងាត់មិនត្រូវគ្នា';
+
+  @override
+  String get passwordTooShort => 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួ';
+
+  @override
+  String get pleaseEnterPhone => 'សូមបញ្ចូលលេខទូរស័ព្ទ';
+
+  @override
+  String get phoneInvalid => 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ';
+
+  @override
+  String get pleaseEnterPassword => 'សូមបញ្ចូលពាក្យសម្ងាត់';
+
+  @override
+  String get pleaseEnterName => 'សូមបញ្ចូលឈ្មោះ';
+
+  @override
+  String get pleaseSelectDateOfBirth => 'សូមជ្រើសរើសថ្ងៃខែឆ្នាំកំណើត';
+
+  @override
+  String get pleaseSelectBloodType => 'សូមជ្រើសរើសក្រុមឈាម';
+
+  @override
+  String get pleaseEnterFamilyContact => 'សូមបញ្ចូលលេខទូរស័ព្ទគ្រួសារ';
+
+  @override
+  String get forgotPassword => 'ភ្លេចពាក្យសម្ងាត់?';
+
+  @override
+  String get dontHaveAccount => 'មិនទាន់មានគណនី? ';
+
+  @override
+  String get alreadyHaveAccount => 'មានគណនីរួចហើយ? ';
+
+  @override
+  String get enterPhoneHint => '012345678';
+
+  @override
+  String get enterPasswordHint => '••••••••';
+
+  @override
+  String get enterNameHint => 'សុខជាត';
+
+  @override
+  String get enterFamilyContactHint => '098765432';
+
+  @override
+  String get enterWeightHint => '60.0';
+
+  @override
+  String get enterAddressHint => 'ភូមិ កុម សង្កាត់';
 }

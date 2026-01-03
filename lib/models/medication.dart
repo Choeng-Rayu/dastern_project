@@ -79,7 +79,7 @@ class Medication {
       'dosage': dosage.toJson(),
       'instruction': instruction,
       'prescribeBy': prescribeBy,
-      'color': color?.value,
+      'color': color?.toARGB32(),
       'icon': icon?.codePoint,
     };
   }

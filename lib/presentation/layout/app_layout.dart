@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../theme/theme.dart';
 
 /// Base layout widget that provides consistent theming across all screens

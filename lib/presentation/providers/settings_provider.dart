@@ -6,7 +6,7 @@ class SettingsProvider extends ChangeNotifier {
   static const String _themeModeKey = 'theme_mode';
   static const String _localeKey = 'locale';
 
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light;
   Locale _locale = const Locale('en');
 
   ThemeMode get themeMode => _themeMode;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/medication_provider.dart';
 import '../providers/reminder_provider.dart';
 import '../../models/medication.dart';
@@ -220,7 +220,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                   Expanded(
                     flex: 3,
                     child: DropdownButtonFormField<Unit>(
-                      value: _selectedUnit,
+                      initialValue: _selectedUnit,
                       decoration: InputDecoration(
                         labelText: l10n.unit,
                         border: OutlineInputBorder(

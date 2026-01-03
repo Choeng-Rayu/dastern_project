@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/settings_provider.dart';
 
 /// Welcome screen - First screen users see
@@ -39,89 +39,6 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Settings Row at the top
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Language Selector
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: DropdownButton<String>(
-                              value: settingsProvider.locale.languageCode,
-                              underline: const SizedBox(),
-                              dropdownColor: const Color(0xFF4DD0E1),
-                              icon: const Icon(Icons.language,
-                                  color: Colors.white),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'en',
-                                  child: Text(l10n.english),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'km',
-                                  child: Text(l10n.khmer),
-                                ),
-                              ],
-                              onChanged: (String? value) {
-                                if (value != null) {
-                                  settingsProvider.setLocale(Locale(value));
-                                }
-                              },
-                            ),
-                          ),
-
-                          // Theme Toggle
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  settingsProvider.isDarkMode
-                                      ? Icons.dark_mode
-                                      : Icons.light_mode,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                                Switch(
-                                  value: settingsProvider.isDarkMode,
-                                  onChanged: (bool value) {
-                                    settingsProvider.setThemeMode(
-                                      value ? ThemeMode.dark : ThemeMode.light,
-                                    );
-                                  },
-                                  activeColor: Colors.white,
-                                  activeTrackColor:
-                                      Colors.white.withOpacity(0.5),
-                                  inactiveThumbColor:
-                                      Colors.white.withOpacity(0.7),
-                                  inactiveTrackColor:
-                                      Colors.white.withOpacity(0.3),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-
                       const Spacer(),
 
                       // App Logo/Icon
