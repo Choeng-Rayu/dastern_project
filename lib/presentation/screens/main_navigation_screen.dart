@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Main navigation screen with bottom navigation bar
 class MainNavigationScreen extends StatelessWidget {
@@ -15,6 +15,7 @@ class MainNavigationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: navigationShell,
@@ -26,8 +27,8 @@ class MainNavigationScreen extends StatelessWidget {
             initialLocation: index == navigationShell.currentIndex,
           );
         },
-        backgroundColor: Colors.white,
-        indicatorColor: Color(0xFF4DD0E1).withOpacity(0.3),
+        backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+        indicatorColor: theme.colorScheme.primary.withOpacity(0.3),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),

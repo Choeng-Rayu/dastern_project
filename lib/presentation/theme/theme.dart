@@ -54,7 +54,7 @@ class AppTheme {
     ),
 
     // Card
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
       color: Colors.white,
       shadowColor: Colors.black.withOpacity(0.1),
@@ -251,7 +251,7 @@ class AppTheme {
     ),
 
     // Card
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 2,
       color: const Color(0xFF2C2C2C),
       shadowColor: Colors.black.withOpacity(0.3),
@@ -439,5 +439,20 @@ class AppTheme {
     if (percentage >= 80) return successColor;
     if (percentage >= 60) return warningColor;
     return errorColor;
+  }
+
+  /// Get gradient background colors for screens
+  static List<Color> getBackgroundGradient(bool isDarkMode) {
+    if (isDarkMode) {
+      return [
+        const Color(0xFF1A3A3F),
+        const Color(0xFF0D2026),
+      ];
+    } else {
+      return [
+        primaryColor,
+        primaryDark,
+      ];
+    }
   }
 }

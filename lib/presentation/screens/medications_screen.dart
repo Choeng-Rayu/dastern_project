@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/medication_provider.dart';
 import '../providers/reminder_provider.dart';
 import '../../models/medication.dart';
 import '../../models/reminder.dart';
-import 'add_edit_medication_screen.dart';
 import './medicine_form_screen.dart';
 
 /// Medications screen - Lists all medications with CRUD operations
@@ -55,7 +55,7 @@ class MedicationsScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AddEditMedicationScreen(
+                        builder: (context) => MedicineFormScreen(
                           medication: medication,
                         ),
                       ),
@@ -67,12 +67,7 @@ class MedicationsScreen extends StatelessWidget {
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MedicineFormScreen(),
-            ),
-          );
+          context.go('/medicine-form');
         },
         icon: const Icon(Icons.add),
         label: Text(l10n.addMedication),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '/l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/medication_provider.dart';
 import '../providers/reminder_provider.dart';
@@ -83,8 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF4DD0E1),
+      backgroundColor: theme.colorScheme.primary,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -95,7 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Back button
                 IconButton(
                   onPressed: () => context.pop(),
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,
+                      color: theme.colorScheme.onPrimary),
                   padding: EdgeInsets.zero,
                   alignment: Alignment.centerLeft,
                 ),
@@ -103,22 +107,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
 
                 // Title
-                const Text(
-                  'ចូលប្រើ',
+                Text(
+                  l10n.login,
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: theme.colorScheme.onPrimary,
                   ),
                 ),
 
                 const SizedBox(height: 8),
 
                 Text(
-                  'សូមស្វាគមន៍ត្រលប់មកវិញ',
+                  l10n.welcomeBack,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
+                    color: theme.colorScheme.onPrimary.withOpacity(0.9),
                   ),
                 ),
 
@@ -146,22 +150,38 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
+                          style: const TextStyle(color: Colors.black87),
                           decoration: InputDecoration(
-                            labelText: 'លេខទូរស័ព្ទ',
-                            hintText: '012345678',
-                            prefixIcon: const Icon(Icons.phone),
+                            labelText: l10n.phoneNumber,
+                            hintText: l10n.enterPhoneHint,
+                            labelStyle: const TextStyle(color: Colors.black54),
+                            hintStyle: const TextStyle(color: Colors.black38),
+                            prefixIcon:
+                                const Icon(Icons.phone, color: Colors.black54),
+                            filled: true,
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.black12),
                             ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.black12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: Color(0xFF4DD0E1), width: 2),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ចូលលេខទូរស័ព្ទ';
+                              return l10n.pleaseEnterPhone;
                             }
                             if (value.length < 8) {
-                              return 'លេខទូរស័ព្ទមិនត្រឹមត្រូវ';
+                              return l10n.phoneInvalid;
                             }
                             return null;
                           },
@@ -173,15 +193,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
+                          style: const TextStyle(color: Colors.black87),
                           decoration: InputDecoration(
-                            labelText: 'ពាក្យសម្ងាត់',
-                            hintText: '••••••••',
-                            prefixIcon: const Icon(Icons.lock),
+                            labelText: l10n.password,
+                            hintText: l10n.enterPasswordHint,
+                            labelStyle: const TextStyle(color: Colors.black54),
+                            hintStyle: const TextStyle(color: Colors.black38),
+                            prefixIcon:
+                                const Icon(Icons.lock, color: Colors.black54),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
+                                color: Colors.black54,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -189,18 +214,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                             ),
+                            filled: true,
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.black12),
                             ),
-                            filled: true,
-                            fillColor: Colors.grey[50],
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.black12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                  color: Color(0xFF4DD0E1), width: 2),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'សូមបញ្ចូលពាក្យសម្ងាត់';
+                              return l10n.pleaseEnterPassword;
                             }
                             if (value.length < 6) {
-                              return 'ពាក្យសម្ងាត់ត្រូវមានយ៉ាងតិច ៦ តួ';
+                              return l10n.passwordTooShort;
+                            }
+                            if (value.length < 6) {
+                              return l10n.passwordTooShort;
                             }
                             return null;
                           },
@@ -215,10 +255,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () {
                               // TODO: Implement forgot password
                             },
-                            child: const Text(
-                              'ភ្លេចពាក្យសម្ងាត់?',
+                            child: Text(
+                              l10n.forgotPassword,
                               style: TextStyle(
-                                color: Color(0xFF4DD0E1),
+                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -234,27 +274,27 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4DD0E1),
-                              foregroundColor: Colors.white,
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
                             child: _isLoading
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 24,
                                     height: 24,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
+                                        theme.colorScheme.onPrimary,
                                       ),
                                     ),
                                   )
-                                : const Text(
-                                    'ចូលប្រើ',
-                                    style: TextStyle(
+                                : Text(
+                                    l10n.login,
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -273,10 +313,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'មិនទាន់មានគណនី? ',
+                      Text(
+                        l10n.dontHaveAccount,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: theme.colorScheme.onPrimary,
                           fontSize: 16,
                         ),
                       ),
@@ -284,14 +324,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           context.pushReplacement('/register');
                         },
-                        child: const Text(
-                          'ចុះឈ្មោះ',
+                        child: Text(
+                          l10n.register,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: theme.colorScheme.onPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.white,
+                            decorationColor: theme.colorScheme.onPrimary,
                           ),
                         ),
                       ),

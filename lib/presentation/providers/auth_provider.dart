@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import '../../services/storage_service.dart';
 import '../../models/patient.dart';
+import '../../models/medication.dart';
 
 /// Provider to manage authentication state
 class AuthProvider extends ChangeNotifier {
   final StorageService _storageService = StorageService();
+
+  // ============ BYPASS ACCOUNT FOR DEVELOPMENT ============
+  // This account allows quick login without registration
+  static const String _bypassPhone = '012345678';
+  static const String _bypassPassword = 'demo123';
+  static final Patient _bypassPatient = Patient(
+    name: 'Demo User',
+    tel: _bypassPhone,
+    familyContact: '0987654321',
+    bloodtype: 'O+',
+    dateOfBirth: DateTime(1990, 1, 1),
+    address: 'Phnom Penh, Cambodia',
+    weight: 70.0,
+  );
+  // ======================================================
 
   bool _isLoggedIn = false;
   Patient? _currentPatient;
@@ -20,11 +36,14 @@ class AuthProvider extends ChangeNotifier {
     debugPrint('👤 [AuthProvider] $message');
   }
 
-  /// Initialize auth state from storage
+  /// Initialize auth state from storage and create bypass account if needed
   Future<void> initialize() async {
     _log('Initializing auth state...');
     _isLoading = true;
     notifyListeners();
+
+    // Ensure bypass account exists
+    await _ensureBypassAccountExists();
 
     _isLoggedIn = await _storageService.isLoggedIn();
 
@@ -37,6 +56,32 @@ class AuthProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  /// Ensure bypass/demo account exists for easy development login
+  Future<void> _ensureBypassAccountExists() async {
+    try {
+      // Check if bypass account exists
+      final exists = await _storageService.verifyCredentials(
+        phone: _bypassPhone,
+        password: _bypassPassword,
+      );
+
+      if (!exists) {
+        // Create bypass account
+        _log('🔧 Creating bypass account for development...');
+        await _storageService.saveUserData(
+          patient: _bypassPatient,
+          password: _bypassPassword,
+        );
+        _log(
+            '✅ Bypass account created (Phone: $_bypassPhone, Password: $_bypassPassword)');
+      } else {
+        _log('✓ Bypass account exists');
+      }
+    } catch (e) {
+      _log('⚠️ Error ensuring bypass account: $e');
+    }
   }
 
   /// Login with credentials

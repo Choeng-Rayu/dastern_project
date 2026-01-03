@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '/models/medication.dart';
-import '/models/intakeHistory.dart';
-import '/l10n/app_localizations.dart';
+import '../../models/medication.dart';
+import '../../models/intakeHistory.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Reusable widget for displaying a medication card
 class MedicationCardWidget extends StatelessWidget {

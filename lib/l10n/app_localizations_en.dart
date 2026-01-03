@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -130,7 +132,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteMedication => 'Delete Medication';
 
   @override
-  String get deleteMedicationMessage => 'Are you sure you want to delete this medication?';
+  String get deleteMedicationMessage =>
+      'Are you sure you want to delete this medication?';
 
   @override
   String get medicationDeleted => 'Medication deleted successfully';
@@ -298,7 +301,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addTime => 'Add Time';
 
   @override
-  String get noRemindersAdded => 'No reminder times added yet. Tap \'Add Time\' to set medication schedule.';
+  String get noRemindersAdded =>
+      'No reminder times added yet. Tap \'Add Time\' to set medication schedule.';
 
   @override
   String get timeOfDay => 'Time of Day';
@@ -329,4 +333,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickActions => 'Quick Actions';
+
+  @override
+  String get fullName => 'Full Name';
+
+  @override
+  String get selectDateOfBirth => 'Select date of birth';
+
+  @override
+  String get bloodType => 'Blood Type';
+
+  @override
+  String get familyContact => 'Family Contact';
+
+  @override
+  String get weight => 'Weight (kg)';
+
+  @override
+  String get address => 'Address (Optional)';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get passwordMismatch => 'Passwords do not match';
+
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters';
+
+  @override
+  String get pleaseEnterPhone => 'Please enter phone number';
+
+  @override
+  String get phoneInvalid => 'Invalid phone number';
+
+  @override
+  String get pleaseEnterPassword => 'Please enter password';
+
+  @override
+  String get pleaseEnterName => 'Please enter name';
+
+  @override
+  String get pleaseSelectDateOfBirth => 'Please select date of birth';
+
+  @override
+  String get pleaseSelectBloodType => 'Please select blood type';
+
+  @override
+  String get pleaseEnterFamilyContact => 'Please enter family contact';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get dontHaveAccount => 'Don\'t have an account? ';
+
+  @override
+  String get alreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get enterPhoneHint => '012345678';
+
+  @override
+  String get enterPasswordHint => '••••••••';
+
+  @override
+  String get enterNameHint => 'Kimhour';
+
+  @override
+  String get enterFamilyContactHint => '098765432';
+
+  @override
+  String get enterWeightHint => '60.0';
+
+  @override
+  String get enterAddressHint => 'Street, District, Province';
 }

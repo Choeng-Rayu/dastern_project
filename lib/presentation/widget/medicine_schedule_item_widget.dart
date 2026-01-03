@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '/models/medication.dart';
-import '/models/reminder.dart';
-import '/models/intakeHistory.dart';
-import '/l10n/app_localizations.dart';
+import '../../models/medication.dart';
+import '../../models/reminder.dart';
+import '../../models/intakeHistory.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Reusable widget for displaying a single medicine schedule item
 class MedicineScheduleItemWidget extends StatelessWidget {

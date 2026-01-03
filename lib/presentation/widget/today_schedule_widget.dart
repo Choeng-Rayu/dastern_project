@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '/models/medication.dart';
-import '/models/reminder.dart';
-import '/models/intakeHistory.dart';
-import '/l10n/app_localizations.dart';
+import '../../models/medication.dart';
+import '../../models/reminder.dart';
+import '../../models/intakeHistory.dart';
+import '../../l10n/app_localizations.dart';
 import 'medicine_schedule_item_widget.dart';
 
 /// Reusable widget for displaying today's medication schedule
