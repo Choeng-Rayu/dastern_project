@@ -267,7 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                             // Blood Type
                             DropdownButtonFormField<String>(
-                              initialValue: _selectedBloodType,
+                              value: _selectedBloodType,
                               style: const TextStyle(color: Colors.black87),
                               dropdownColor: Colors.white,
                               decoration: InputDecoration(

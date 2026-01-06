@@ -79,7 +79,8 @@ class Medication {
       'dosage': dosage.toJson(),
       'instruction': instruction,
       'prescribeBy': prescribeBy,
-      'color': color?.toARGB32(),
+      // 'color': color?.toARGB32(), /// in computer it error i need to fix that
+      'color': color?.value,
       'icon': icon?.codePoint,
     };
   }
