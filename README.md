@@ -72,7 +72,7 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/dastern_project.git
+   git clone https://github.com/Choeng-Rayu/dastern_project.git
    cd dastern_project
    ```
 
@@ -183,7 +183,7 @@ We love contributions! Here's how you can help make Dastern even better:
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/your-username/dastern_project.git
+   git clone https://github.com/Choeng-Rayu/dastern_project.git
    cd dastern_project
    ```
 
