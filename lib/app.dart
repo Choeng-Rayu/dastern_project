@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:device_preview/device_preview.dart';
 
 import 'l10n/app_localizations.dart';
 import 'presentation/providers/settings_provider.dart';
@@ -153,8 +154,11 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
           title: 'DasTern',
           debugShowCheckedModeBanner: false,
 
+          // Device Preview configuration
+          locale: DevicePreview.locale(context) ?? settings.locale,
+          builder: DevicePreview.appBuilder,
+
           // Localization configuration
-          locale: settings.locale,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

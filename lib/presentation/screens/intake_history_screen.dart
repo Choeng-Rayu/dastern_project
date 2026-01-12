@@ -342,7 +342,7 @@ class _HistoryCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           '(${l10n.delayed})',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 11,
                             color: AppTheme.delayedColor,
                             fontStyle: FontStyle.italic,

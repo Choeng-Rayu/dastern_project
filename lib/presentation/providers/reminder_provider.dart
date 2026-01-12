@@ -50,7 +50,7 @@ class ReminderProvider extends ChangeNotifier {
         DateTime(now.year, now.month, now.day, 20, 0); // 8:00 PM
 
     // All days of the week
-    final allDays = WeekDay.values;
+    const allDays = WeekDay.values;
 
     final reminders = [
       Reminder(

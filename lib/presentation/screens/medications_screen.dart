@@ -20,6 +20,10 @@ class MedicationsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
         title: Text(l10n.medications),
         elevation: 0,
       ),
@@ -320,7 +324,7 @@ class _MedicationCard extends StatelessWidget {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
                 if (reminders.length > 3) ...[
                   const SizedBox(height: 4),
                   Padding(

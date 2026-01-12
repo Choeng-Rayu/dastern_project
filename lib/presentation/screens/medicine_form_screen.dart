@@ -97,7 +97,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
             return ReminderTime(
               time: TimeOfDay.fromDateTime(reminder.time),
               timeOfDay: reminder.timeOfDay,
-              activeDays: reminder.activeDays,
+              activeDays: List.from(reminder.activeDays), // Mutable copy
               dosageAmount: reminder.dosageAmount,
             );
           }).toList();
@@ -120,7 +120,8 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
       _reminderTimes.add(ReminderTime(
         time: const TimeOfDay(hour: 8, minute: 0),
         timeOfDay: MedicationTimeOfDay.morning,
-        activeDays: WeekDay.values, // All days by default
+        activeDays:
+            List.from(WeekDay.values), // Mutable copy - All days by default
         dosageAmount: 1,
       ));
     });
@@ -140,7 +141,22 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
     if (picked != null) {
       setState(() {
         _reminderTimes[index].time = picked;
+        // Auto-calculate time of day based on the hour
+        _reminderTimes[index].timeOfDay = _getTimeOfDayFromHour(picked.hour);
       });
+    }
+  }
+
+  /// Auto-calculate MedicationTimeOfDay based on hour
+  MedicationTimeOfDay _getTimeOfDayFromHour(int hour) {
+    if (hour >= 5 && hour < 12) {
+      return MedicationTimeOfDay.morning; // 5:00 AM - 11:59 AM
+    } else if (hour >= 12 && hour < 17) {
+      return MedicationTimeOfDay.afternoon; // 12:00 PM - 4:59 PM
+    } else if (hour >= 17 && hour < 20) {
+      return MedicationTimeOfDay.evening; // 5:00 PM - 7:59 PM
+    } else {
+      return MedicationTimeOfDay.night; // 8:00 PM - 4:59 AM
     }
   }
 
@@ -555,65 +571,75 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                         const SizedBox(height: 24),
 
                         // Color picker
-                        const Text(
+                        Text(
                           'Color',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
-                          height: 50,
-                          child: ListView.builder(
+                          height: 56,
+                          child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            itemCount: _availableColors.length,
-                            itemBuilder: (context, index) {
-                              final color = _availableColors[index];
-                              final isSelected = color == _selectedColor;
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedColor = color;
-                                  });
-                                },
-                                child: Container(
-                                  width: 50,
-                                  height: 50,
-                                  margin: const EdgeInsets.only(right: 12),
-                                  decoration: BoxDecoration(
-                                    color: color,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? Colors.black
-                                          : Colors.transparent,
-                                      width: 3,
+                            child: Row(
+                              children: _availableColors.map((color) {
+                                final isSelected = color == _selectedColor;
+                                return GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _selectedColor = color),
+                                  child: Container(
+                                    width: 56,
+                                    height: 56,
+                                    margin: const EdgeInsets.only(right: 12),
+                                    decoration: BoxDecoration(
+                                      color: color,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? (isDark
+                                                ? Colors.white
+                                                : Colors.black)
+                                            : Colors.transparent,
+                                        width: 3,
+                                      ),
+                                      boxShadow: isSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: color.withOpacity(0.5),
+                                                blurRadius: 8,
+                                                spreadRadius: 2,
+                                              )
+                                            ]
+                                          : null,
                                     ),
+                                    child: isSelected
+                                        ? const Icon(Icons.check,
+                                            color: Colors.white, size: 28)
+                                        : null,
                                   ),
-                                  child: isSelected
-                                      ? const Icon(Icons.check,
-                                          color: Colors.white)
-                                      : null,
-                                ),
-                              );
-                            },
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ),
 
                         const SizedBox(height: 24),
 
                         // Icon picker
-                        const Text(
+                        Text(
                           'Icon',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
-                          height: 50,
+                          height: 56,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: _availableIcons.length,
@@ -627,13 +653,15 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                   });
                                 },
                                 child: Container(
-                                  width: 50,
-                                  height: 50,
+                                  width: 56,
+                                  height: 56,
                                   margin: const EdgeInsets.only(right: 12),
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? _selectedColor.withOpacity(0.2)
-                                        : Colors.grey[200],
+                                        : (isDark
+                                            ? Colors.grey[800]
+                                            : Colors.grey[200]),
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                       color: isSelected
@@ -646,7 +674,10 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                     icon,
                                     color: isSelected
                                         ? _selectedColor
-                                        : Colors.grey[600],
+                                        : (isDark
+                                            ? Colors.grey[400]
+                                            : Colors.grey[600]),
+                                    size: 28,
                                   ),
                                 ),
                               );
@@ -805,8 +836,34 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                       onChanged: (value) {
                                         if (value != null) {
                                           setState(() {
-                                            _reminderTimes[index].timeOfDay =
-                                                value;
+                                            // Validate: Check if manually selected time of day matches the actual time
+                                            final correctTimeOfDay =
+                                                _getTimeOfDayFromHour(
+                                                    _reminderTimes[index]
+                                                        .time
+                                                        .hour);
+
+                                            if (value != correctTimeOfDay) {
+                                              // Show warning and auto-correct
+                                              _reminderTimes[index].timeOfDay =
+                                                  correctTimeOfDay;
+
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Time of day auto-corrected to match ${_reminderTimes[index].time.format(context)}',
+                                                  ),
+                                                  backgroundColor:
+                                                      Colors.orange,
+                                                  duration: const Duration(
+                                                      seconds: 2),
+                                                ),
+                                              );
+                                            } else {
+                                              _reminderTimes[index].timeOfDay =
+                                                  value;
+                                            }
                                           });
                                         }
                                       },
@@ -846,28 +903,60 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 12),
                                     Wrap(
                                       spacing: 8,
+                                      runSpacing: 8,
+                                      alignment: WrapAlignment.start,
                                       children: WeekDay.values.map((day) {
                                         final isActive = reminderTime.activeDays
                                             .contains(day);
-                                        return FilterChip(
-                                          label: Text(_getDayAbbreviation(day)),
-                                          selected: isActive,
-                                          onSelected: (selected) {
-                                            setState(() {
-                                              if (selected) {
-                                                _reminderTimes[index]
-                                                    .activeDays
-                                                    .add(day);
-                                              } else {
-                                                _reminderTimes[index]
-                                                    .activeDays
-                                                    .remove(day);
-                                              }
-                                            });
-                                          },
+                                        return SizedBox(
+                                          width: 60,
+                                          child: FilterChip(
+                                            label: SizedBox(
+                                              width: 30,
+                                              child: Text(
+                                                _getDayAbbreviation(day),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: isActive
+                                                      ? Colors.white
+                                                      : Colors.grey[700],
+                                                  fontWeight: isActive
+                                                      ? FontWeight.w600
+                                                      : FontWeight.normal,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ),
+                                            selected: isActive,
+                                            selectedColor: _selectedColor,
+                                            checkmarkColor: Colors.white,
+                                            backgroundColor: Colors.grey[200],
+                                            side: BorderSide(
+                                              color: isActive
+                                                  ? _selectedColor
+                                                  : Colors.grey[300]!,
+                                              width: 1.5,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4, vertical: 8),
+                                            showCheckmark: true,
+                                            onSelected: (selected) {
+                                              setState(() {
+                                                if (selected) {
+                                                  _reminderTimes[index]
+                                                      .activeDays
+                                                      .add(day);
+                                                } else {
+                                                  _reminderTimes[index]
+                                                      .activeDays
+                                                      .remove(day);
+                                                }
+                                              });
+                                            },
+                                          ),
                                         );
                                       }).toList(),
                                     ),
@@ -897,7 +986,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                 ? const SizedBox(
                                     width: 24,
                                     height: 24,
-                                    child: const CircularProgressIndicator(
+                                    child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         Colors.white,

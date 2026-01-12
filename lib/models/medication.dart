@@ -18,6 +18,8 @@
 /// * [Unit.mg] - Milligrams (mass/weight measurement)
 /// * [Unit.other] - Other non-standard measurement units
 /// {@endtemplate}
+library;
+
 import 'package:flutter/material.dart';
 import './generateId.dart';
 

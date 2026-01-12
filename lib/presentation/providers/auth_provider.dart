@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/storage_service.dart';
 import '../../models/patient.dart';
-import '../../models/medication.dart';
 
 /// Provider to manage authentication state
 class AuthProvider extends ChangeNotifier {

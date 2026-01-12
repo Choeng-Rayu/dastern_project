@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'package:device_preview/device_preview.dart';
 
 import 'app.dart';
 import 'presentation/providers/settings_provider.dart';
@@ -52,16 +54,19 @@ void main() async {
   }
 
   runApp(
-    MultiProvider(
-      providers: [
-        Provider<NotificationService>.value(value: notificationService),
-        ChangeNotifierProvider.value(value: settingsProvider),
-        ChangeNotifierProvider.value(value: authProvider),
-        ChangeNotifierProvider.value(value: medicationProvider),
-        ChangeNotifierProvider.value(value: reminderProvider),
-        ChangeNotifierProvider.value(value: intakeHistoryProvider),
-      ],
-      child: const DasternApp(),
+    DevicePreview(
+      enabled: !kReleaseMode, // Only enable in debug mode
+      builder: (context) => MultiProvider(
+        providers: [
+          Provider<NotificationService>.value(value: notificationService),
+          ChangeNotifierProvider.value(value: settingsProvider),
+          ChangeNotifierProvider.value(value: authProvider),
+          ChangeNotifierProvider.value(value: medicationProvider),
+          ChangeNotifierProvider.value(value: reminderProvider),
+          ChangeNotifierProvider.value(value: intakeHistoryProvider),
+        ],
+        child: const DasternApp(),
+      ),
     ),
   );
 }
