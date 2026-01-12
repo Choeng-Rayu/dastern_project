@@ -55,14 +55,14 @@ enum BloodGroup {
 
 ' Classes
 class Patient {
-  +id: String
-  +name: String
-  +dateOfBirth: DateTime
-  +address: String?
-  +tel: String
-  +bloodtype: String?
-  +familyContact: String?
-  +weight: double?
+  -id: String
+  -name: String
+  -dateOfBirth: DateTime
+  -address: String?
+  -tel: String
+  -bloodtype: String?
+  -familyContact: String?
+  -weight: double?
   --
   +toJson(): Map<String, dynamic>
   +copyWith(): Patient
@@ -71,8 +71,8 @@ class Patient {
 }
 
 class Dosage {
-  +amount: double
-  +unit: Unit
+  -amount: double
+  -unit: Unit
   --
   +toJson(): Map<String, dynamic>
   +fromJson(json): Dosage {static}
@@ -80,13 +80,13 @@ class Dosage {
 }
 
 class Medication {
-  +id: String
-  +name: String
-  +dosage: Dosage
-  +instruction: String
-  +prescribeBy: String
-  +color: Color?
-  +icon: IconData?
+  -id: String
+  -name: String
+  -dosage: Dosage
+  -instruction: String
+  -prescribeBy: String
+  -color: Color?
+  -icon: IconData?
   --
   +toJson(): Map<String, dynamic>
   +fromJson(json): Medication {static}
@@ -94,13 +94,13 @@ class Medication {
 }
 
 class Reminder {
-  +id: String
-  +medicationId: String
-  +time: DateTime
-  +dosageAmount: int
-  +timeOfDay: MedicationTimeOfDay
-  +activeDays: List<WeekDay>
-  +isActive: bool
+  -id: String
+  -medicationId: String
+  -time: DateTime
+  -dosageAmount: int
+  -timeOfDay: MedicationTimeOfDay
+  -activeDays: List<WeekDay>
+  -isActive: bool
   --
   +toJson(): Map<String, dynamic>
   +fromJson(json): Reminder {static}
@@ -109,12 +109,12 @@ class Reminder {
 }
 
 class IntakeHistory {
-  +id: String
-  +medicationId: String
-  +reminderId: String
-  +scheduledTime: DateTime
-  +takenAt: DateTime?
-  +status: IntakeStatus
+  -id: String
+  -medicationId: String
+  -reminderId: String
+  -scheduledTime: DateTime
+  -takenAt: DateTime?
+  -status: IntakeStatus
   --
   +toJson(): Map<String, dynamic>
   +fromJson(json): IntakeHistory {static}
