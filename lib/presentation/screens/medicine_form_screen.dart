@@ -450,7 +450,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                             Expanded(
                               flex: 3,
                               child: DropdownButtonFormField<Unit>(
-                                initialValue: _selectedUnit,
+                                value: _selectedUnit,
                                 style: TextStyle(
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
@@ -804,7 +804,7 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                     // Time of day dropdown
                                     DropdownButtonFormField<
                                         MedicationTimeOfDay>(
-                                      initialValue: reminderTime.timeOfDay,
+                                      value: reminderTime.timeOfDay,
                                       decoration: InputDecoration(
                                         labelText: l10n.timeOfDay,
                                         border: OutlineInputBorder(
