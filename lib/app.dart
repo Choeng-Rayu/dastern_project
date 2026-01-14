@@ -98,7 +98,7 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
     setState(() {
       _isLoggedIn = isLoggedIn;
     });
-    
+
     // Navigate based on login state
     if (isLoggedIn) {
       _navigatorKey.currentState?.pushAndRemoveUntil(
@@ -291,13 +291,11 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
             );
           default:
             return MaterialPageRoute(
-              builder: (_) => _isLoggedIn 
-                ? _buildMainNavigation() 
-                : _buildWelcomeScreen(),
+              builder: (_) =>
+                  _isLoggedIn ? _buildMainNavigation() : _buildWelcomeScreen(),
             );
         }
       },
     );
   }
 }
-

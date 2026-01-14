@@ -64,9 +64,11 @@ class _MedicationsScreenState extends State<MedicationsScreen> {
 
     // Use nested navigator if available, otherwise use regular Navigator
     if (widget.navigatorKey?.currentState != null) {
-      widget.navigatorKey!.currentState!.push(
+      widget.navigatorKey!.currentState!
+          .push(
         MaterialPageRoute(builder: (context) => formScreen),
-      ).then((_) {
+      )
+          .then((_) {
         // Notify parent that we've returned from form
         widget.onReturnFromForm?.call();
         if (mounted) setState(() {});

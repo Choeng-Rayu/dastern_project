@@ -44,9 +44,8 @@ class Reminder {
       medicationId: json['medicationId'] as String,
       time: DateTime.parse(json['time'] as String),
       dosageAmount: json['dosageAmount'] as int,
-      mealTime: MealTime.values
-          .firstWhere((e) => e.name == json['mealTime'],
-              orElse: () => MealTime.breakfast),
+      mealTime: MealTime.values.firstWhere((e) => e.name == json['mealTime'],
+          orElse: () => MealTime.breakfast),
       activeDays: (json['activeDays'] as List)
           .map((day) => WeekDay.values.firstWhere((e) => e.name == day))
           .toList(),

@@ -201,8 +201,8 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  AppLocalizations.of(context)!.duplicateReminderError),
+              content:
+                  Text(AppLocalizations.of(context)!.duplicateReminderError),
               backgroundColor: Colors.red,
             ),
           );
@@ -222,8 +222,8 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  AppLocalizations.of(context)!.duplicateMealTimeError),
+              content:
+                  Text(AppLocalizations.of(context)!.duplicateMealTimeError),
               backgroundColor: Colors.red,
             ),
           );
@@ -902,13 +902,15 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                       child: Row(
                                         children: [
                                           Icon(
-                                            _getMealTimeIcon(reminderTime.mealTime),
+                                            _getMealTimeIcon(
+                                                reminderTime.mealTime),
                                             color: _selectedColor,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
-                                            _getMealTimeLabel(l10n, reminderTime.mealTime),
+                                            _getMealTimeLabel(
+                                                l10n, reminderTime.mealTime),
                                             style: const TextStyle(
                                               fontSize: 16,
                                             ),

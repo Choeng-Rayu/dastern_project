@@ -47,13 +47,13 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   AppTab _currentTab = AppTab.dashboard;
   bool _isShowingMedicineForm = false;
-  
+
   // Navigator keys for nested navigation
   final _medicationsNavigatorKey = GlobalKey<NavigatorState>();
 
   void _onTabSelected(int index) {
     final selectedTab = AppTab.values[index];
-    
+
     // If "Add Medicine" tab is selected, push the form screen in medications tab
     if (selectedTab == AppTab.addMedicine) {
       // Switch to medications tab content but highlight Add Medicine
@@ -63,7 +63,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       });
       // Then push the form screen using the nested navigator
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _medicationsNavigatorKey.currentState?.push(
+        _medicationsNavigatorKey.currentState
+            ?.push(
           MaterialPageRoute(
             builder: (context) => MedicineFormScreen(
               medicationService: widget.medicationService,
@@ -74,7 +75,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               },
             ),
           ),
-        ).then((_) {
+        )
+            .then((_) {
           // When form is popped, switch back to Medicine List highlight
           if (mounted) {
             setState(() {
@@ -96,7 +98,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     }
 
     // Pop to root when switching away from medications tab
-    if (_currentTab == AppTab.medicineList && selectedTab != AppTab.medicineList) {
+    if (_currentTab == AppTab.medicineList &&
+        selectedTab != AppTab.medicineList) {
       _medicationsNavigatorKey.currentState?.popUntil((route) => route.isFirst);
       _isShowingMedicineForm = false;
     }
@@ -183,7 +186,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         ],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _isShowingMedicineForm ? AppTab.addMedicine.index : _currentTab.index,
+        selectedIndex: _isShowingMedicineForm
+            ? AppTab.addMedicine.index
+            : _currentTab.index,
         onDestinationSelected: _onTabSelected,
         backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
         indicatorColor: theme.colorScheme.primary.withOpacity(0.3),

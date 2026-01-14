@@ -593,7 +593,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/today-reminders'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/today-reminders'),
                 child: Text(l10n.viewAll),
               ),
             ],
