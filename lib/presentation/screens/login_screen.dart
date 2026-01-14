@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/auth_provider.dart';
-import '../providers/medication_provider.dart';
-import '../providers/reminder_provider.dart';
-import '../providers/intake_history_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/medication_service.dart';
+import '../../services/reminder_service.dart';
+import '../../services/intake_history_service.dart';
 
 /// Login screen - User authentication
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final AuthService authService;
+  final MedicationService medicationService;
+  final ReminderService reminderService;
+  final IntakeHistoryService intakeHistoryService;
+  final VoidCallback onLoginSuccess;
+
+  const LoginScreen({
+    super.key,
+    required this.authService,
+    required this.medicationService,
+    required this.reminderService,
+    required this.intakeHistoryService,
+    required this.onLoginSuccess,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -35,16 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final medicationProvider =
-          Provider.of<MedicationProvider>(context, listen: false);
-      final reminderProvider =
-          Provider.of<ReminderProvider>(context, listen: false);
-      final intakeHistoryProvider =
-          Provider.of<IntakeHistoryProvider>(context, listen: false);
-
       // Try to login with stored credentials
-      final success = await authProvider.login(
+      final success = await widget.authService.login(
         phone: _phoneController.text.trim(),
         password: _passwordController.text,
       );
@@ -55,19 +58,17 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         if (success) {
-          // Reload all provider data for the newly logged in user
-          debugPrint('🔄 Reloading provider data after login...');
+          // Reload all service data for the newly logged in user
+          debugPrint('🔄 Reloading service data after login...');
           await Future.wait([
-            medicationProvider.initialize(),
-            reminderProvider.initialize(),
-            intakeHistoryProvider.initialize(),
+            widget.medicationService.initialize(),
+            widget.reminderService.initialize(),
+            widget.intakeHistoryService.initialize(),
           ]);
-          debugPrint('✅ Provider data reloaded');
+          debugPrint('✅ Service data reloaded');
 
-          // Navigate to dashboard after successful login
-          if (mounted) {
-            context.go('/dashboard');
-          }
+          // Notify parent about login success (handles navigation)
+          widget.onLoginSuccess();
         } else {
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Back button
                 IconButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () => Navigator.pop(context),
                   icon: Icon(Icons.arrow_back,
                       color: theme.colorScheme.onPrimary),
                   padding: EdgeInsets.zero,
@@ -322,7 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          context.pushReplacement('/register');
+                          Navigator.pushReplacementNamed(context, '/register');
                         },
                         child: Text(
                           l10n.register,

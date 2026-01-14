@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../providers/settings_provider.dart';
-import '../providers/auth_provider.dart';
+import '../../services/settings_service.dart';
+import '../../services/auth_service.dart';
 import '../../services/notification_service.dart';
 import '../widget/gradient_background.dart';
 
 /// Profile screen - User settings and preferences
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final SettingsService settingsService;
+  final AuthService authService;
+  final NotificationService notificationService;
+  final void Function(ThemeMode) onThemeChanged;
+  final void Function(Locale) onLocaleChanged;
+  final VoidCallback onLogout;
+
+  const ProfileScreen({
+    super.key,
+    required this.settingsService,
+    required this.authService,
+    required this.notificationService,
+    required this.onThemeChanged,
+    required this.onLocaleChanged,
+    required this.onLogout,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final settingsProvider = Provider.of<SettingsProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -46,9 +57,9 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        if (authProvider.userName != null)
+                        if (authService.userName != null)
                           Text(
-                            '${l10n.hello}, ${authProvider.userName}!',
+                            '${l10n.hello}, ${authService.userName}!',
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white.withOpacity(0.9),
@@ -57,7 +68,7 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 32),
 
                         // User Info Card
-                        if (authProvider.userPhone != null)
+                        if (authService.userPhone != null)
                           Card(
                             margin: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
@@ -67,7 +78,7 @@ class ProfileScreen extends StatelessWidget {
                               leading: Icon(Icons.phone,
                                   color: theme.colorScheme.primary),
                               title: Text(l10n.phoneNumber),
-                              subtitle: Text(authProvider.userPhone!),
+                              subtitle: Text(authService.userPhone!),
                             ),
                           ),
                         const SizedBox(height: 16),
@@ -81,19 +92,19 @@ class ProfileScreen extends StatelessWidget {
                           child: SwitchListTile(
                             title: Text(l10n.theme),
                             subtitle: Text(
-                              settingsProvider.isDarkMode
+                              settingsService.isDarkMode
                                   ? l10n.darkMode
                                   : l10n.lightMode,
                             ),
                             secondary: Icon(
-                              settingsProvider.isDarkMode
+                              settingsService.isDarkMode
                                   ? Icons.dark_mode
                                   : Icons.light_mode,
                               color: theme.colorScheme.primary,
                             ),
-                            value: settingsProvider.isDarkMode,
+                            value: settingsService.isDarkMode,
                             onChanged: (bool value) {
-                              settingsProvider.setThemeMode(
+                              onThemeChanged(
                                 value ? ThemeMode.dark : ThemeMode.light,
                               );
                             },
@@ -124,7 +135,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                 ),
                                 DropdownButton<String>(
-                                  value: settingsProvider.locale.languageCode,
+                                  value: settingsService.locale.languageCode,
                                   underline: const SizedBox(),
                                   items: [
                                     DropdownMenuItem(
@@ -138,7 +149,7 @@ class ProfileScreen extends StatelessWidget {
                                   ],
                                   onChanged: (String? value) {
                                     if (value != null) {
-                                      settingsProvider.setLocale(Locale(value));
+                                      onLocaleChanged(Locale(value));
                                     }
                                   },
                                 ),
@@ -154,11 +165,6 @@ class ProfileScreen extends StatelessWidget {
                           height: 56,
                           child: OutlinedButton.icon(
                             onPressed: () async {
-                              final notificationService =
-                                  Provider.of<NotificationService>(
-                                context,
-                                listen: false,
-                              );
                               await notificationService.showNotification(
                                 title: '💊 Test Notification',
                                 body:
@@ -215,10 +221,8 @@ class ProfileScreen extends StatelessWidget {
                               );
 
                               if (confirm == true && context.mounted) {
-                                await authProvider.logout();
-                                if (context.mounted) {
-                                  context.go('/');
-                                }
+                                await authService.logout();
+                                onLogout(); // Handles navigation
                               }
                             },
                             icon: const Icon(Icons.logout),

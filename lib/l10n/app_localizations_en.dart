@@ -72,6 +72,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hello => 'Hello';
 
   @override
+  String get morning => 'Good Morning';
+
+  @override
+  String get afternoon => 'Good Afternoon';
+
+  @override
+  String get evening => 'Good Evening';
+
+  @override
+  String get night => 'Good Night';
+
+  @override
   String get dateOfBirth => 'Date of Birth';
 
   @override
@@ -184,16 +196,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remindersGenerated => 'Reminders generated successfully';
 
   @override
-  String get morning => 'Morning';
+  String get breakfast => 'Breakfast';
 
   @override
-  String get afternoon => 'Afternoon';
+  String get lunch => 'Lunch';
 
   @override
-  String get evening => 'Evening';
+  String get dinner => 'Dinner';
 
   @override
-  String get night => 'Night';
+  String get bedtime => 'Bedtime';
 
   @override
   String get delete => 'Delete';
@@ -305,10 +317,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'No reminder times added yet. Tap \'Add Time\' to set medication schedule.';
 
   @override
-  String get timeOfDay => 'Time of Day';
+  String get mealTime => 'Meal Time';
 
   @override
-  String get dosageAmount => 'Dosage Amount';
+  String get dosagePerReminder => 'Dosage Per Reminder';
+
+  @override
+  String get totalMedicationAmount => 'Total Amount';
+
+  @override
+  String get duplicateReminderError => 'A reminder at this time already exists';
+
+  @override
+  String get duplicateMealTimeError =>
+      'A reminder for this meal time already exists';
+
+  @override
+  String get allMealTimesUsed => 'All meal times are already assigned';
 
   @override
   String get activeDays => 'Active Days';
@@ -408,4 +433,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterAddressHint => 'Street, District, Province';
+
+  @override
+  String get pullToRefresh => 'Pull down to refresh';
 }

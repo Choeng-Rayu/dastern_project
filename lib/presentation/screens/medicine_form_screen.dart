@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/medication_provider.dart';
-import '../providers/reminder_provider.dart';
+import '../../services/medication_service.dart';
+import '../../services/reminder_service.dart';
 import '../../models/medication.dart';
 import '../../models/reminder.dart';
 import '../../services/notification_service.dart';
@@ -11,8 +10,19 @@ import '../widget/gradient_background.dart';
 /// Medicine Form screen - Create new medication with custom reminder times
 class MedicineFormScreen extends StatefulWidget {
   final Medication? medication;
+  final MedicationService? medicationService;
+  final ReminderService? reminderService;
+  final NotificationService? notificationService;
+  final VoidCallback? onSaved;
 
-  const MedicineFormScreen({super.key, this.medication});
+  const MedicineFormScreen({
+    super.key,
+    this.medication,
+    this.medicationService,
+    this.reminderService,
+    this.notificationService,
+    this.onSaved,
+  });
 
   @override
   State<MedicineFormScreen> createState() => _MedicineFormScreenState();
@@ -20,13 +30,13 @@ class MedicineFormScreen extends StatefulWidget {
 
 class ReminderTime {
   TimeOfDay time;
-  MedicationTimeOfDay timeOfDay;
+  MealTime mealTime;
   List<WeekDay> activeDays;
   int dosageAmount;
 
   ReminderTime({
     required this.time,
-    required this.timeOfDay,
+    required this.mealTime,
     required this.activeDays,
     this.dosageAmount = 1,
   });
@@ -72,6 +82,14 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
     Icons.colorize,
   ];
 
+  // Get services - use singletons if not provided
+  MedicationService get _medicationService =>
+      widget.medicationService ?? MedicationService();
+  ReminderService get _reminderService =>
+      widget.reminderService ?? ReminderService();
+  NotificationService get _notificationService =>
+      widget.notificationService ?? NotificationService();
+
   @override
   void initState() {
     super.initState();
@@ -87,16 +105,14 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
 
       // Load existing reminders
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final reminderProvider =
-            Provider.of<ReminderProvider>(context, listen: false);
         final existingReminders =
-            reminderProvider.getRemindersForMedication(widget.medication!.id);
+            _reminderService.getRemindersForMedication(widget.medication!.id);
 
         setState(() {
           _reminderTimes = existingReminders.map((reminder) {
             return ReminderTime(
               time: TimeOfDay.fromDateTime(reminder.time),
-              timeOfDay: reminder.timeOfDay,
+              mealTime: reminder.mealTime,
               activeDays: List.from(reminder.activeDays), // Mutable copy
               dosageAmount: reminder.dosageAmount,
             );
@@ -116,15 +132,48 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
   }
 
   void _addReminderTime() {
+    // Find a unique time and meal time for the new reminder
+    final availableMealTimes = MealTime.values.where((mealTime) {
+      return !_reminderTimes.any((r) => r.mealTime == mealTime);
+    }).toList();
+
+    if (availableMealTimes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.allMealTimesUsed),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Get the default time for the first available meal time
+    final defaultMealTime = availableMealTimes.first;
+    final defaultTime = _getDefaultTimeForMealTime(defaultMealTime);
+
     setState(() {
       _reminderTimes.add(ReminderTime(
-        time: const TimeOfDay(hour: 8, minute: 0),
-        timeOfDay: MedicationTimeOfDay.morning,
+        time: defaultTime,
+        mealTime: defaultMealTime,
         activeDays:
             List.from(WeekDay.values), // Mutable copy - All days by default
         dosageAmount: 1,
       ));
     });
+  }
+
+  /// Get a default time based on meal time
+  TimeOfDay _getDefaultTimeForMealTime(MealTime mealTime) {
+    switch (mealTime) {
+      case MealTime.breakfast:
+        return const TimeOfDay(hour: 8, minute: 0);
+      case MealTime.lunch:
+        return const TimeOfDay(hour: 12, minute: 0);
+      case MealTime.dinner:
+        return const TimeOfDay(hour: 18, minute: 0);
+      case MealTime.bedtime:
+        return const TimeOfDay(hour: 21, minute: 0);
+    }
   }
 
   void _removeReminderTime(int index) {
@@ -139,24 +188,67 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
       initialTime: _reminderTimes[index].time,
     );
     if (picked != null) {
+      // Check for duplicate reminder at this time
+      final isDuplicateTime = _reminderTimes.asMap().entries.any((entry) {
+        final i = entry.key;
+        final reminderTime = entry.value;
+        return i != index &&
+            reminderTime.time.hour == picked.hour &&
+            reminderTime.time.minute == picked.minute;
+      });
+
+      if (isDuplicateTime) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  AppLocalizations.of(context)!.duplicateReminderError),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Check if the new time would result in a duplicate meal time
+      final newMealTime = _getMealTimeFromHour(picked.hour);
+      final isDuplicateMealTime = _reminderTimes.asMap().entries.any((entry) {
+        final i = entry.key;
+        final reminderTime = entry.value;
+        return i != index && reminderTime.mealTime == newMealTime;
+      });
+
+      if (isDuplicateMealTime) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  AppLocalizations.of(context)!.duplicateMealTimeError),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
       setState(() {
         _reminderTimes[index].time = picked;
-        // Auto-calculate time of day based on the hour
-        _reminderTimes[index].timeOfDay = _getTimeOfDayFromHour(picked.hour);
+        // Auto-calculate meal time based on the hour
+        _reminderTimes[index].mealTime = newMealTime;
       });
     }
   }
 
-  /// Auto-calculate MedicationTimeOfDay based on hour
-  MedicationTimeOfDay _getTimeOfDayFromHour(int hour) {
-    if (hour >= 5 && hour < 12) {
-      return MedicationTimeOfDay.morning; // 5:00 AM - 11:59 AM
-    } else if (hour >= 12 && hour < 17) {
-      return MedicationTimeOfDay.afternoon; // 12:00 PM - 4:59 PM
-    } else if (hour >= 17 && hour < 20) {
-      return MedicationTimeOfDay.evening; // 5:00 PM - 7:59 PM
+  /// Auto-calculate MealTime based on hour
+  MealTime _getMealTimeFromHour(int hour) {
+    if (hour >= 5 && hour < 11) {
+      return MealTime.breakfast; // 5:00 AM - 10:59 AM
+    } else if (hour >= 11 && hour < 14) {
+      return MealTime.lunch; // 11:00 AM - 1:59 PM
+    } else if (hour >= 14 && hour < 20) {
+      return MealTime.dinner; // 2:00 PM - 7:59 PM
     } else {
-      return MedicationTimeOfDay.night; // 8:00 PM - 4:59 AM
+      return MealTime.bedtime; // 8:00 PM - 4:59 AM
     }
   }
 
@@ -177,10 +269,6 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
       });
 
       final l10n = AppLocalizations.of(context)!;
-      final medicationProvider =
-          Provider.of<MedicationProvider>(context, listen: false);
-      final reminderProvider =
-          Provider.of<ReminderProvider>(context, listen: false);
 
       final dosage = Dosage(
         amount: double.parse(_amountController.text),
@@ -200,10 +288,10 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
           color: _selectedColor,
           icon: _selectedIcon,
         );
-        await medicationProvider.updateMedication(medication);
+        await _medicationService.updateMedication(medication);
 
         // Delete old reminders before creating new ones
-        await reminderProvider.deleteRemindersForMedication(medication.id);
+        await _reminderService.deleteRemindersForMedication(medication.id);
       } else {
         // Create new medication
         medication = Medication(
@@ -214,12 +302,8 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
           color: _selectedColor,
           icon: _selectedIcon,
         );
-        await medicationProvider.addMedication(medication);
+        await _medicationService.addMedication(medication);
       }
-
-      if (!context.mounted) return;
-      final notificationService =
-          Provider.of<NotificationService>(context, listen: false);
 
       // Create reminders with custom times and schedule notifications
       for (final reminderTime in _reminderTimes) {
@@ -236,16 +320,16 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
           medicationId: medication.id,
           time: reminderDateTime,
           dosageAmount: reminderTime.dosageAmount,
-          timeOfDay: reminderTime.timeOfDay,
+          mealTime: reminderTime.mealTime,
           activeDays: reminderTime.activeDays,
           isActive: true,
         );
 
-        await reminderProvider.addReminder(reminder);
+        await _reminderService.addReminder(reminder);
 
         // Schedule notification for this reminder if it's for today
         if (reminder.shouldFireToday() && reminderDateTime.isAfter(now)) {
-          await notificationService.scheduleReminder(
+          await _notificationService.scheduleReminder(
             id: reminder.id,
             medicationName: medication.name,
             scheduledTime: reminderDateTime,
@@ -270,20 +354,11 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
           ),
         );
 
-        if (isEditing) {
-          // Pop back to previous screen after editing
-          Navigator.pop(context);
-        } else {
-          // Clear form for next entry when adding
-          _nameController.clear();
-          _amountController.clear();
-          _instructionController.clear();
-          _prescriberController.clear();
-          setState(() {
-            _selectedUnit = Unit.tablet;
-            _reminderTimes.clear();
-          });
-        }
+        // Call onSaved callback to refresh parent widget
+        widget.onSaved?.call();
+
+        // Pop back to previous screen after saving (both create and edit)
+        Navigator.pop(context);
       }
     }
   }
@@ -305,20 +380,29 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
               padding: const EdgeInsets.all(24.0),
               child: Row(
                 children: [
+                  // Back button
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    padding: EdgeInsets.zero,
+                  ),
+                  const SizedBox(width: 8),
                   if (widget.medication == null)
                     const Icon(Icons.add_circle_outline,
                         color: Colors.white, size: 32)
                   else
                     const Icon(Icons.edit, color: Colors.white, size: 32),
                   const SizedBox(width: 12),
-                  Text(
-                    widget.medication == null
-                        ? l10n.addMedication
-                        : l10n.editMedication,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Expanded(
+                    child: Text(
+                      widget.medication == null
+                          ? l10n.addMedication
+                          : l10n.editMedication,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -383,9 +467,9 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
 
                         const SizedBox(height: 16),
 
-                        // Dosage section
+                        // Total medication amount section
                         Text(
-                          l10n.dosage,
+                          l10n.totalMedicationAmount,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -801,12 +885,10 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                     ),
                                     const SizedBox(height: 12),
 
-                                    // Time of day dropdown
-                                    DropdownButtonFormField<
-                                        MedicationTimeOfDay>(
-                                      value: reminderTime.timeOfDay,
+                                    // Meal time dropdown (read-only, auto-calculated from time)
+                                    InputDecorator(
                                       decoration: InputDecoration(
-                                        labelText: l10n.timeOfDay,
+                                        labelText: l10n.mealTime,
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -814,69 +896,35 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                                 horizontal: 12, vertical: 8),
+                                        filled: true,
+                                        fillColor: Colors.grey[100],
                                       ),
-                                      items: [
-                                        DropdownMenuItem(
-                                          value: MedicationTimeOfDay.morning,
-                                          child: Text(l10n.morning),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: MedicationTimeOfDay.afternoon,
-                                          child: Text(l10n.afternoon),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: MedicationTimeOfDay.evening,
-                                          child: Text(l10n.evening),
-                                        ),
-                                        DropdownMenuItem(
-                                          value: MedicationTimeOfDay.night,
-                                          child: Text(l10n.night),
-                                        ),
-                                      ],
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          setState(() {
-                                            // Validate: Check if manually selected time of day matches the actual time
-                                            final correctTimeOfDay =
-                                                _getTimeOfDayFromHour(
-                                                    _reminderTimes[index]
-                                                        .time
-                                                        .hour);
-
-                                            if (value != correctTimeOfDay) {
-                                              // Show warning and auto-correct
-                                              _reminderTimes[index].timeOfDay =
-                                                  correctTimeOfDay;
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'Time of day auto-corrected to match ${_reminderTimes[index].time.format(context)}',
-                                                  ),
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                  duration: const Duration(
-                                                      seconds: 2),
-                                                ),
-                                              );
-                                            } else {
-                                              _reminderTimes[index].timeOfDay =
-                                                  value;
-                                            }
-                                          });
-                                        }
-                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            _getMealTimeIcon(reminderTime.mealTime),
+                                            color: _selectedColor,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            _getMealTimeLabel(l10n, reminderTime.mealTime),
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(height: 12),
 
-                                    // Dosage amount
+                                    // Dosage amount per reminder
                                     TextFormField(
                                       initialValue:
                                           reminderTime.dosageAmount.toString(),
                                       keyboardType: TextInputType.number,
                                       decoration: InputDecoration(
-                                        labelText: l10n.dosageAmount,
+                                        labelText: l10n.dosagePerReminder,
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(8),
@@ -1043,6 +1091,32 @@ class _MedicineFormScreenState extends State<MedicineFormScreen> {
         return 'mg';
       case Unit.other:
         return 'other';
+    }
+  }
+
+  IconData _getMealTimeIcon(MealTime mealTime) {
+    switch (mealTime) {
+      case MealTime.breakfast:
+        return Icons.free_breakfast;
+      case MealTime.lunch:
+        return Icons.lunch_dining;
+      case MealTime.dinner:
+        return Icons.dinner_dining;
+      case MealTime.bedtime:
+        return Icons.bedtime;
+    }
+  }
+
+  String _getMealTimeLabel(AppLocalizations l10n, MealTime mealTime) {
+    switch (mealTime) {
+      case MealTime.breakfast:
+        return l10n.breakfast;
+      case MealTime.lunch:
+        return l10n.lunch;
+      case MealTime.dinner:
+        return l10n.dinner;
+      case MealTime.bedtime:
+        return l10n.bedtime;
     }
   }
 }

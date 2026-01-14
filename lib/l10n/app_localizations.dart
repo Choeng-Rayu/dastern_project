@@ -224,6 +224,30 @@ abstract class AppLocalizations {
   /// **'Hello'**
   String get hello;
 
+  /// Morning greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good Morning'**
+  String get morning;
+
+  /// Afternoon greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good Afternoon'**
+  String get afternoon;
+
+  /// Evening greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good Evening'**
+  String get evening;
+
+  /// Night greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good Night'**
+  String get night;
+
   /// Date of birth label
   ///
   /// In en, this message translates to:
@@ -446,29 +470,29 @@ abstract class AppLocalizations {
   /// **'Reminders generated successfully'**
   String get remindersGenerated;
 
-  /// Morning time
+  /// Breakfast meal time
   ///
   /// In en, this message translates to:
-  /// **'Morning'**
-  String get morning;
+  /// **'Breakfast'**
+  String get breakfast;
 
-  /// Afternoon time
+  /// Lunch meal time
   ///
   /// In en, this message translates to:
-  /// **'Afternoon'**
-  String get afternoon;
+  /// **'Lunch'**
+  String get lunch;
 
-  /// Evening time
+  /// Dinner meal time
   ///
   /// In en, this message translates to:
-  /// **'Evening'**
-  String get evening;
+  /// **'Dinner'**
+  String get dinner;
 
-  /// Night time
+  /// Bedtime
   ///
   /// In en, this message translates to:
-  /// **'Night'**
-  String get night;
+  /// **'Bedtime'**
+  String get bedtime;
 
   /// Delete button
   ///
@@ -686,17 +710,41 @@ abstract class AppLocalizations {
   /// **'No reminder times added yet. Tap \'Add Time\' to set medication schedule.'**
   String get noRemindersAdded;
 
-  /// Time of day label
+  /// Meal time label
   ///
   /// In en, this message translates to:
-  /// **'Time of Day'**
-  String get timeOfDay;
+  /// **'Meal Time'**
+  String get mealTime;
 
-  /// Dosage amount label
+  /// Dosage per reminder label
   ///
   /// In en, this message translates to:
-  /// **'Dosage Amount'**
-  String get dosageAmount;
+  /// **'Dosage Per Reminder'**
+  String get dosagePerReminder;
+
+  /// Total medication amount label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Amount'**
+  String get totalMedicationAmount;
+
+  /// Duplicate reminder error message
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder at this time already exists'**
+  String get duplicateReminderError;
+
+  /// Duplicate meal time error message
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder for this meal time already exists'**
+  String get duplicateMealTimeError;
+
+  /// All meal times used message
+  ///
+  /// In en, this message translates to:
+  /// **'All meal times are already assigned'**
+  String get allMealTimesUsed;
 
   /// Active days label
   ///
@@ -895,6 +943,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Street, District, Province'**
   String get enterAddressHint;
+
+  /// Pull to refresh hint
+  ///
+  /// In en, this message translates to:
+  /// **'Pull down to refresh'**
+  String get pullToRefresh;
 }
 
 class _AppLocalizationsDelegate

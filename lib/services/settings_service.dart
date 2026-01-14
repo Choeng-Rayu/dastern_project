@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Provider for managing app settings (theme and locale)
-class SettingsProvider extends ChangeNotifier {
+/// Service for managing app settings (theme and locale)
+class SettingsService {
+  static final SettingsService _instance = SettingsService._internal();
+  factory SettingsService() => _instance;
+  SettingsService._internal();
+
   static const String _themeModeKey = 'theme_mode';
   static const String _localeKey = 'locale';
 
@@ -30,8 +34,6 @@ class SettingsProvider extends ChangeNotifier {
     if (localeCode != null) {
       _locale = Locale(localeCode);
     }
-
-    notifyListeners();
   }
 
   /// Update theme mode and persist to storage
@@ -39,7 +41,6 @@ class SettingsProvider extends ChangeNotifier {
     if (_themeMode == mode) return;
 
     _themeMode = mode;
-    notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_themeModeKey, mode.toString());
@@ -50,7 +51,6 @@ class SettingsProvider extends ChangeNotifier {
     if (_locale == locale) return;
 
     _locale = locale;
-    notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_localeKey, locale.languageCode);

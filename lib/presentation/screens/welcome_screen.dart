@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/settings_provider.dart';
+import '../../services/settings_service.dart';
 
 /// Welcome screen - First screen users see
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({super.key});
+  final SettingsService settingsService;
+  final void Function(Locale) onLocaleChanged;
+
+  const WelcomeScreen({
+    super.key,
+    required this.settingsService,
+    required this.onLocaleChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final settingsProvider = Provider.of<SettingsProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -97,7 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
-                            context.push('/login');
+                            Navigator.pushNamed(context, '/login');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -125,7 +129,7 @@ class WelcomeScreen extends StatelessWidget {
                         height: 56,
                         child: OutlinedButton(
                           onPressed: () {
-                            context.push('/register');
+                            Navigator.pushNamed(context, '/register');
                           },
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.white,

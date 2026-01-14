@@ -1,10 +1,14 @@
-import 'package:flutter/material.dart';
-import '../../services/storage_service.dart';
-import '../../models/intakeHistory.dart';
-import '../../models/reminder.dart';
+import 'storage_service.dart';
+import '../models/intakeHistory.dart';
+import '../models/reminder.dart';
 
-/// Provider to manage intake history with local storage
-class IntakeHistoryProvider extends ChangeNotifier {
+/// Service to manage intake history with local storage
+class IntakeHistoryService {
+  static final IntakeHistoryService _instance =
+      IntakeHistoryService._internal();
+  factory IntakeHistoryService() => _instance;
+  IntakeHistoryService._internal();
+
   final StorageService _storageService = StorageService();
 
   List<IntakeHistory> _histories = [];
@@ -16,12 +20,10 @@ class IntakeHistoryProvider extends ChangeNotifier {
   /// Initialize intake histories from storage
   Future<void> initialize() async {
     _isLoading = true;
-    notifyListeners();
 
     _histories = await _storageService.getIntakeHistories();
 
     _isLoading = false;
-    notifyListeners();
   }
 
   /// Get history for a specific medication
@@ -95,15 +97,17 @@ class IntakeHistoryProvider extends ChangeNotifier {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Check if we already have histories for today
+    // Build a lookup of reminderId -> existing history for today so we only
+    // create records that do not yet exist. This allows adding multiple
+    // reminders in one day without skipping the later ones.
     final todayHistories = getTodayHistories();
-    if (todayHistories.isNotEmpty) {
-      return; // Already generated
-    }
+    final existingReminderIds =
+        todayHistories.map((history) => history.reminderId).toSet();
 
     // Create history for each active reminder that should fire today
     for (var reminder in reminders) {
-      if (reminder.shouldFireToday()) {
+      if (reminder.shouldFireToday() &&
+          !existingReminderIds.contains(reminder.id)) {
         final scheduledTime = DateTime(
           today.year,
           today.month,
@@ -128,7 +132,6 @@ class IntakeHistoryProvider extends ChangeNotifier {
   Future<void> addHistory(IntakeHistory history) async {
     _histories.add(history);
     await _storageService.saveIntakeHistories(_histories);
-    notifyListeners();
   }
 
   /// Mark intake as taken
@@ -140,7 +143,6 @@ class IntakeHistoryProvider extends ChangeNotifier {
         takenAt: DateTime.now(),
       );
       await _storageService.saveIntakeHistories(_histories);
-      notifyListeners();
     }
   }
 
@@ -152,7 +154,6 @@ class IntakeHistoryProvider extends ChangeNotifier {
         status: IntakeStatus.skipped,
       );
       await _storageService.saveIntakeHistories(_histories);
-      notifyListeners();
     }
   }
 
@@ -175,7 +176,6 @@ class IntakeHistoryProvider extends ChangeNotifier {
 
     if (hasChanges) {
       await _storageService.saveIntakeHistories(_histories);
-      notifyListeners();
     }
   }
 
@@ -185,7 +185,6 @@ class IntakeHistoryProvider extends ChangeNotifier {
     if (index != -1) {
       _histories[index] = history;
       await _storageService.saveIntakeHistories(_histories);
-      notifyListeners();
     }
   }
 
@@ -193,20 +192,17 @@ class IntakeHistoryProvider extends ChangeNotifier {
   Future<void> deleteHistory(String historyId) async {
     _histories.removeWhere((h) => h.id == historyId);
     await _storageService.saveIntakeHistories(_histories);
-    notifyListeners();
   }
 
   /// Delete all histories for a medication
   Future<void> deleteHistoriesForMedication(String medicationId) async {
     _histories.removeWhere((h) => h.medicationId == medicationId);
     await _storageService.saveIntakeHistories(_histories);
-    notifyListeners();
   }
 
   /// Clear all histories
   Future<void> clearAllHistories() async {
     _histories.clear();
     await _storageService.saveIntakeHistories(_histories);
-    notifyListeners();
   }
 }

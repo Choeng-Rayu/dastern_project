@@ -84,6 +84,22 @@
   "@hello": {
     "description": "Greeting"
   },
+  "morning": "Good Morning",
+  "@morning": {
+    "description": "Morning greeting"
+  },
+  "afternoon": "Good Afternoon",
+  "@afternoon": {
+    "description": "Afternoon greeting"
+  },
+  "evening": "Good Evening",
+  "@evening": {
+    "description": "Evening greeting"
+  },
+  "night": "Good Night",
+  "@night": {
+    "description": "Night greeting"
+  },
   "dateOfBirth": "Date of Birth",
   "@dateOfBirth": {
     "description": "Date of birth label"
@@ -232,21 +248,21 @@
   "@remindersGenerated": {
     "description": "Reminders generated success message"
   },
-  "morning": "Morning",
-  "@morning": {
-    "description": "Morning time"
+  "breakfast": "Breakfast",
+  "@breakfast": {
+    "description": "Breakfast meal time"
   },
-  "afternoon": "Afternoon",
-  "@afternoon": {
-    "description": "Afternoon time"
+  "lunch": "Lunch",
+  "@lunch": {
+    "description": "Lunch meal time"
   },
-  "evening": "Evening",
-  "@evening": {
-    "description": "Evening time"
+  "dinner": "Dinner",
+  "@dinner": {
+    "description": "Dinner meal time"
   },
-  "night": "Night",
-  "@night": {
-    "description": "Night time"
+  "bedtime": "Bedtime",
+  "@bedtime": {
+    "description": "Bedtime"
   },
   "delete": "Delete",
   "@delete": {
@@ -392,13 +408,29 @@
   "@noRemindersAdded": {
     "description": "No reminders added message"
   },
-  "timeOfDay": "Time of Day",
-  "@timeOfDay": {
-    "description": "Time of day label"
+  "mealTime": "Meal Time",
+  "@mealTime": {
+    "description": "Meal time label"
   },
-  "dosageAmount": "Dosage Amount",
-  "@dosageAmount": {
-    "description": "Dosage amount label"
+  "dosagePerReminder": "Dosage Per Reminder",
+  "@dosagePerReminder": {
+    "description": "Dosage per reminder label"
+  },
+  "totalMedicationAmount": "Total Amount",
+  "@totalMedicationAmount": {
+    "description": "Total medication amount label"
+  },
+  "duplicateReminderError": "A reminder at this time already exists",
+  "@duplicateReminderError": {
+    "description": "Duplicate reminder error message"
+  },
+  "duplicateMealTimeError": "A reminder for this meal time already exists",
+  "@duplicateMealTimeError": {
+    "description": "Duplicate meal time error message"
+  },
+  "allMealTimesUsed": "All meal times are already assigned",
+  "@allMealTimesUsed": {
+    "description": "All meal times used message"
   },
   "activeDays": "Active Days",
   "@activeDays": {
@@ -531,5 +563,9 @@
   "enterAddressHint": "Street, District, Province",
   "@enterAddressHint": {
     "description": "Address hint"
+  },
+  "pullToRefresh": "Pull down to refresh",
+  "@pullToRefresh": {
+    "description": "Pull to refresh hint"
   }
 }

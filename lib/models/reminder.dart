@@ -1,6 +1,7 @@
 import './generateId.dart';
 
-enum MedicationTimeOfDay { morning, afternoon, evening, night, other }
+/// Meal time for medication reminders
+enum MealTime { breakfast, lunch, dinner, bedtime }
 
 enum WeekDay { monday, tuesday, wednesday, thursday, friday, saturday, sunday }
 
@@ -8,8 +9,8 @@ class Reminder {
   final String id;
   final String medicationId; // Reference to a single medication
   final DateTime time; // Specific time for the reminder
-  final int dosageAmount; // How many tablets/units to take
-  final MedicationTimeOfDay timeOfDay;
+  final int dosageAmount; // How many tablets/units to take per reminder
+  final MealTime mealTime; // Which meal this reminder is associated with
   final List<WeekDay> activeDays; // Days when this reminder is active
   final bool isActive; // Whether the reminder is currently enabled
 
@@ -18,7 +19,7 @@ class Reminder {
     required this.medicationId,
     required this.time,
     required this.dosageAmount,
-    required this.timeOfDay,
+    required this.mealTime,
     required this.activeDays,
     this.isActive = true,
   }) : id = id ?? generateId.v4();
@@ -30,7 +31,7 @@ class Reminder {
       'medicationId': medicationId,
       'time': time.toIso8601String(),
       'dosageAmount': dosageAmount,
-      'timeOfDay': timeOfDay.name,
+      'mealTime': mealTime.name,
       'activeDays': activeDays.map((day) => day.name).toList(),
       'isActive': isActive,
     };
@@ -43,8 +44,9 @@ class Reminder {
       medicationId: json['medicationId'] as String,
       time: DateTime.parse(json['time'] as String),
       dosageAmount: json['dosageAmount'] as int,
-      timeOfDay: MedicationTimeOfDay.values
-          .firstWhere((e) => e.name == json['timeOfDay']),
+      mealTime: MealTime.values
+          .firstWhere((e) => e.name == json['mealTime'],
+              orElse: () => MealTime.breakfast),
       activeDays: (json['activeDays'] as List)
           .map((day) => WeekDay.values.firstWhere((e) => e.name == day))
           .toList(),
@@ -58,7 +60,7 @@ class Reminder {
     String? medicationId,
     DateTime? time,
     int? dosageAmount,
-    MedicationTimeOfDay? timeOfDay,
+    MealTime? mealTime,
     List<WeekDay>? activeDays,
     bool? isActive,
   }) {
@@ -67,7 +69,7 @@ class Reminder {
       medicationId: medicationId ?? this.medicationId,
       time: time ?? this.time,
       dosageAmount: dosageAmount ?? this.dosageAmount,
-      timeOfDay: timeOfDay ?? this.timeOfDay,
+      mealTime: mealTime ?? this.mealTime,
       activeDays: activeDays ?? this.activeDays,
       isActive: isActive ?? this.isActive,
     );

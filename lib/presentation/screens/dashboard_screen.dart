@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:go_router/go_router.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/intakeHistory.dart';
 import '../../models/medication.dart';
-import '../providers/auth_provider.dart';
-import '../providers/medication_provider.dart';
-import '../providers/reminder_provider.dart';
-import '../providers/intake_history_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/medication_service.dart';
+import '../../services/reminder_service.dart';
+import '../../services/intake_history_service.dart';
 import '../layout/app_layout.dart';
 import '../theme/theme.dart';
 import '../widget/gradient_background.dart';
+import './medicine_form_screen.dart';
 
 /// Dashboard screen - Main hub with real-time medication data
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final AuthService authService;
+  final MedicationService medicationService;
+  final ReminderService reminderService;
+  final IntakeHistoryService intakeHistoryService;
+  final VoidCallback? onViewAllMedications;
+
+  const DashboardScreen({
+    super.key,
+    required this.authService,
+    required this.medicationService,
+    required this.reminderService,
+    required this.intakeHistoryService,
+    this.onViewAllMedications,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -32,12 +44,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _generateTodayIntakes() async {
-    final reminderProvider =
-        Provider.of<ReminderProvider>(context, listen: false);
-    final historyProvider =
-        Provider.of<IntakeHistoryProvider>(context, listen: false);
+    await widget.intakeHistoryService
+        .generateTodayIntakes(widget.reminderService.reminders);
+    if (mounted) {
+      setState(() {}); // Refresh UI after generating intakes
+    }
+  }
 
-    await historyProvider.generateTodayIntakes(reminderProvider.reminders);
+  /// Refresh all dashboard data
+  Future<void> _refreshDashboard() async {
+    // Reload all data from storage
+    await Future.wait([
+      widget.medicationService.initialize(),
+      widget.reminderService.initialize(),
+      widget.intakeHistoryService.initialize(),
+    ]);
+
+    // Generate today's intakes with fresh reminder data
+    await widget.intakeHistoryService
+        .generateTodayIntakes(widget.reminderService.reminders);
+
+    // Update UI
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -51,7 +81,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         isDarkMode: isDarkMode,
         child: SafeArea(
           child: RefreshIndicator(
-            onRefresh: _generateTodayIntakes,
+            onRefresh: _refreshDashboard,
+            color: const Color(0xFF4DD0E1),
+            backgroundColor: isDarkMode ? Colors.grey[900] : Colors.white,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
@@ -81,8 +113,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildHeader(AppLocalizations l10n) {
-    final authProvider = Provider.of<AuthProvider>(context);
-
     return Row(
       children: [
         Container(
@@ -120,7 +150,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               Text(
-                authProvider.currentPatient?.name ?? 'Guest',
+                widget.authService.currentPatient?.name ?? 'Guest',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -142,14 +172,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: Colors.white,
             ),
           ),
-          onPressed: () => context.push('/today-reminders'),
+          onPressed: () => Navigator.pushNamed(context, '/today-reminders'),
         ),
       ],
     );
   }
 
   Widget _buildGreeting(AppLocalizations l10n, bool isDarkMode) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final now = DateTime.now();
     final greeting = _getGreeting(now, l10n);
 
@@ -175,7 +204,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            '${l10n.hello} ${authProvider.currentPatient?.name ?? 'Guest'}!',
+            '${l10n.hello} ${widget.authService.currentPatient?.name ?? 'Guest'}!',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
@@ -210,12 +239,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildQuickStats(AppLocalizations l10n, bool isDarkMode) {
-    final historyProvider = Provider.of<IntakeHistoryProvider>(context);
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
 
-    final stats = historyProvider.getStatistics(today, tomorrow);
+    final stats = widget.intakeHistoryService.getStatistics(today, tomorrow);
     final taken = stats['taken'] ?? 0;
     final pending = stats['pending'] ?? 0;
     final missed = stats['missed'] ?? 0;
@@ -296,8 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildMedicationCards(AppLocalizations l10n, bool isDarkMode) {
-    final medicationProvider = Provider.of<MedicationProvider>(context);
-    final medications = medicationProvider.medications;
+    final medications = widget.medicationService.medications;
 
     if (medications.isEmpty) {
       return Container(
@@ -324,7 +351,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
-              onPressed: () => context.go('/medicine-form'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MedicineFormScreen(
+                      medicationService: widget.medicationService,
+                      reminderService: widget.reminderService,
+                    ),
+                  ),
+                ).then((_) {
+                  if (mounted) setState(() {});
+                });
+              },
               icon: const Icon(Icons.add),
               label: Text(l10n.addMedication),
             ),
@@ -348,7 +387,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             TextButton(
-              onPressed: () => context.go('/medicine-list'),
+              onPressed: widget.onViewAllMedications,
               child: Text(
                 l10n.viewAll,
                 style: const TextStyle(color: Colors.white),
@@ -374,8 +413,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildMedicationCard(
       medication, bool isDarkMode, AppLocalizations l10n) {
-    final reminderProvider = Provider.of<ReminderProvider>(context);
-    final reminders = reminderProvider.getRemindersForMedication(medication.id);
+    final reminders =
+        widget.reminderService.getRemindersForMedication(medication.id);
     final activeReminders = reminders.where((r) => r.isActive).length;
 
     return Container(
@@ -458,7 +497,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             l10n.todayReminders,
             Icons.notifications_active,
             AppTheme.primaryColor,
-            () => context.push('/today-reminders'),
+            () => Navigator.pushNamed(context, '/today-reminders'),
             isDarkMode,
           ),
         ),
@@ -468,7 +507,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             l10n.viewHistory,
             Icons.history,
             AppTheme.infoColor,
-            () => context.push('/intake-history'),
+            () => Navigator.pushNamed(context, '/intake-history'),
             isDarkMode,
           ),
         ),
@@ -523,9 +562,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildTodaySchedule(AppLocalizations l10n, bool isDarkMode) {
-    final historyProvider = Provider.of<IntakeHistoryProvider>(context);
-    final medicationProvider = Provider.of<MedicationProvider>(context);
-    final todayHistories = historyProvider.getTodayHistories();
+    final todayHistories = widget.intakeHistoryService.getTodayHistories();
 
     return Container(
       width: double.infinity,
@@ -556,7 +593,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () => context.push('/today-reminders'),
+                onPressed: () => Navigator.pushNamed(context, '/today-reminders'),
                 child: Text(l10n.viewAll),
               ),
             ],
@@ -586,8 +623,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             )
           else
             ...todayHistories.take(3).map((history) {
-              final medication =
-                  medicationProvider.getMedicationById(history.medicationId);
+              final medication = widget.medicationService
+                  .getMedicationById(history.medicationId);
               if (medication == null) return const SizedBox.shrink();
 
               return _buildScheduleItem(history, medication, isDarkMode, l10n);
@@ -603,8 +640,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     bool isDarkMode,
     AppLocalizations l10n,
   ) {
-    final historyProvider =
-        Provider.of<IntakeHistoryProvider>(context, listen: false);
     final statusColor = _getStatusColor(history.status);
     final timeFormat = DateFormat.Hm();
 
@@ -661,12 +696,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
             IconButton(
               icon: const Icon(Icons.check_circle_outline),
               color: AppTheme.takenColor,
-              onPressed: () => historyProvider.markAsTaken(history.id),
+              onPressed: () async {
+                await widget.intakeHistoryService.markAsTaken(history.id);
+                if (mounted) setState(() {});
+              },
             ),
             IconButton(
               icon: const Icon(Icons.remove_circle_outline),
               color: AppTheme.skippedColor,
-              onPressed: () => historyProvider.markAsSkipped(history.id),
+              onPressed: () async {
+                await widget.intakeHistoryService.markAsSkipped(history.id);
+                if (mounted) setState(() {});
+              },
             ),
           ] else
             StatusBadge(status: history.status.name, isSmall: true),

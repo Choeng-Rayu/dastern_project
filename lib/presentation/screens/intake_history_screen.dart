@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/medication_provider.dart';
-import '../providers/intake_history_provider.dart';
+import '../../services/medication_service.dart';
+import '../../services/intake_history_service.dart';
 import '../../models/intakeHistory.dart';
 import '../../models/medication.dart';
 import '../theme/theme.dart';
@@ -11,7 +10,14 @@ import '../layout/app_layout.dart';
 
 /// Intake History Screen - Shows medication intake history with statistics
 class IntakeHistoryScreen extends StatefulWidget {
-  const IntakeHistoryScreen({super.key});
+  final MedicationService medicationService;
+  final IntakeHistoryService intakeHistoryService;
+
+  const IntakeHistoryScreen({
+    super.key,
+    required this.medicationService,
+    required this.intakeHistoryService,
+  });
 
   @override
   State<IntakeHistoryScreen> createState() => _IntakeHistoryScreenState();
@@ -25,14 +31,13 @@ class _IntakeHistoryScreenState extends State<IntakeHistoryScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    final historyProvider = Provider.of<IntakeHistoryProvider>(context);
-    final medicationProvider = Provider.of<MedicationProvider>(context);
 
     final now = DateTime.now();
     final startDate = _getStartDate(now);
-    final histories = _getFilteredHistories(historyProvider, startDate, now);
-    final stats = historyProvider.getStatistics(startDate, now);
-    final adherenceRate = historyProvider.getAdherenceRate(startDate, now);
+    final histories = _getFilteredHistories(startDate, now);
+    final stats = widget.intakeHistoryService.getStatistics(startDate, now);
+    final adherenceRate =
+        widget.intakeHistoryService.getAdherenceRate(startDate, now);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -149,7 +154,7 @@ class _IntakeHistoryScreenState extends State<IntakeHistoryScreen> {
                     itemCount: histories.length,
                     itemBuilder: (context, index) {
                       final history = histories[index];
-                      final medication = medicationProvider
+                      final medication = widget.medicationService
                           .getMedicationById(history.medicationId);
 
                       if (medication == null) {
@@ -228,9 +233,8 @@ class _IntakeHistoryScreenState extends State<IntakeHistoryScreen> {
     }
   }
 
-  List<IntakeHistory> _getFilteredHistories(
-      IntakeHistoryProvider provider, DateTime start, DateTime end) {
-    return provider.histories
+  List<IntakeHistory> _getFilteredHistories(DateTime start, DateTime end) {
+    return widget.intakeHistoryService.histories
         .where((h) =>
             h.scheduledTime.isAfter(start) && h.scheduledTime.isBefore(end))
         .toList()

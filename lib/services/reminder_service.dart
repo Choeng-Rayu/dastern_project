@@ -1,10 +1,13 @@
-import 'package:flutter/material.dart';
-import '../../services/storage_service.dart';
-import '../../models/reminder.dart';
-import '../../models/medication.dart';
+import 'storage_service.dart';
+import '../models/reminder.dart';
+import '../models/medication.dart';
 
-/// Provider to manage reminders with auto-generation from medications
-class ReminderProvider extends ChangeNotifier {
+/// Service to manage reminders with auto-generation from medications
+class ReminderService {
+  static final ReminderService _instance = ReminderService._internal();
+  factory ReminderService() => _instance;
+  ReminderService._internal();
+
   final StorageService _storageService = StorageService();
 
   List<Reminder> _reminders = [];
@@ -16,12 +19,10 @@ class ReminderProvider extends ChangeNotifier {
   /// Initialize reminders from storage
   Future<void> initialize() async {
     _isLoading = true;
-    notifyListeners();
 
     _reminders = await _storageService.getReminders();
 
     _isLoading = false;
-    notifyListeners();
   }
 
   /// Get reminders for a specific medication
@@ -45,9 +46,9 @@ class ReminderProvider extends ChangeNotifier {
     // Define default times
     final morningTime = DateTime(now.year, now.month, now.day, 8, 0); // 8:00 AM
     final afternoonTime =
-        DateTime(now.year, now.month, now.day, 14, 0); // 2:00 PM
+        DateTime(now.year, now.month, now.day, 12, 0); // 12:00 PM
     final eveningTime =
-        DateTime(now.year, now.month, now.day, 20, 0); // 8:00 PM
+        DateTime(now.year, now.month, now.day, 18, 0); // 6:00 PM
 
     // All days of the week
     const allDays = WeekDay.values;
@@ -57,7 +58,7 @@ class ReminderProvider extends ChangeNotifier {
         medicationId: medication.id,
         time: morningTime,
         dosageAmount: dosageAmount,
-        timeOfDay: MedicationTimeOfDay.morning,
+        mealTime: MealTime.breakfast,
         activeDays: allDays,
         isActive: true,
       ),
@@ -65,7 +66,7 @@ class ReminderProvider extends ChangeNotifier {
         medicationId: medication.id,
         time: afternoonTime,
         dosageAmount: dosageAmount,
-        timeOfDay: MedicationTimeOfDay.afternoon,
+        mealTime: MealTime.lunch,
         activeDays: allDays,
         isActive: true,
       ),
@@ -73,7 +74,7 @@ class ReminderProvider extends ChangeNotifier {
         medicationId: medication.id,
         time: eveningTime,
         dosageAmount: dosageAmount,
-        timeOfDay: MedicationTimeOfDay.evening,
+        mealTime: MealTime.dinner,
         activeDays: allDays,
         isActive: true,
       ),
@@ -90,7 +91,6 @@ class ReminderProvider extends ChangeNotifier {
   Future<Reminder> addReminder(Reminder reminder) async {
     _reminders.add(reminder);
     await _storageService.saveReminders(_reminders);
-    notifyListeners();
     return reminder;
   }
 
@@ -100,7 +100,6 @@ class ReminderProvider extends ChangeNotifier {
     if (index != -1) {
       _reminders[index] = reminder;
       await _storageService.saveReminders(_reminders);
-      notifyListeners();
     }
   }
 
@@ -108,14 +107,12 @@ class ReminderProvider extends ChangeNotifier {
   Future<void> deleteReminder(String reminderId) async {
     _reminders.removeWhere((rem) => rem.id == reminderId);
     await _storageService.saveReminders(_reminders);
-    notifyListeners();
   }
 
   /// Delete all reminders for a medication
   Future<void> deleteRemindersForMedication(String medicationId) async {
     _reminders.removeWhere((rem) => rem.medicationId == medicationId);
     await _storageService.saveReminders(_reminders);
-    notifyListeners();
   }
 
   /// Toggle reminder active status
@@ -126,7 +123,6 @@ class ReminderProvider extends ChangeNotifier {
         isActive: !_reminders[index].isActive,
       );
       await _storageService.saveReminders(_reminders);
-      notifyListeners();
     }
   }
 
@@ -134,6 +130,5 @@ class ReminderProvider extends ChangeNotifier {
   Future<void> clearAllReminders() async {
     _reminders.clear();
     await _storageService.saveReminders(_reminders);
-    notifyListeners();
   }
 }

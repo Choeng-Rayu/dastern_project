@@ -1,77 +1,158 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/medication_provider.dart';
-import '../providers/reminder_provider.dart';
+import '../../services/medication_service.dart';
+import '../../services/reminder_service.dart';
+import '../../services/notification_service.dart';
 import '../../models/medication.dart';
 import '../../models/reminder.dart';
 import './medicine_form_screen.dart';
 
 /// Medications screen - Lists all medications with CRUD operations
-class MedicationsScreen extends StatelessWidget {
-  const MedicationsScreen({super.key});
+class MedicationsScreen extends StatefulWidget {
+  final MedicationService medicationService;
+  final ReminderService reminderService;
+  final NotificationService? notificationService;
+  final VoidCallback? onMedicationChanged;
+  final GlobalKey<NavigatorState>? navigatorKey;
+  final VoidCallback? onNavigateToForm;
+  final VoidCallback? onReturnFromForm;
+
+  const MedicationsScreen({
+    super.key,
+    required this.medicationService,
+    required this.reminderService,
+    this.notificationService,
+    this.onMedicationChanged,
+    this.navigatorKey,
+    this.onNavigateToForm,
+    this.onReturnFromForm,
+  });
+
+  @override
+  State<MedicationsScreen> createState() => _MedicationsScreenState();
+}
+
+class _MedicationsScreenState extends State<MedicationsScreen> {
+  Future<void> _refreshMedications() async {
+    // Re-initialize the services to load fresh data from storage
+    await widget.medicationService.initialize();
+    await widget.reminderService.initialize();
+
+    if (mounted) {
+      setState(() {}); // Refresh UI
+    }
+  }
+
+  void _onMedicationSaved() {
+    // Refresh the list when a medication is saved
+    setState(() {});
+    widget.onMedicationChanged?.call();
+  }
+
+  /// Navigate to medicine form using nested navigator if available
+  void _navigateToForm({Medication? medication}) {
+    final formScreen = MedicineFormScreen(
+      medication: medication,
+      medicationService: widget.medicationService,
+      reminderService: widget.reminderService,
+      notificationService: widget.notificationService,
+      onSaved: _onMedicationSaved,
+    );
+
+    // Notify parent that we're navigating to form (to highlight Add Medicine tab)
+    widget.onNavigateToForm?.call();
+
+    // Use nested navigator if available, otherwise use regular Navigator
+    if (widget.navigatorKey?.currentState != null) {
+      widget.navigatorKey!.currentState!.push(
+        MaterialPageRoute(builder: (context) => formScreen),
+      ).then((_) {
+        // Notify parent that we've returned from form
+        widget.onReturnFromForm?.call();
+        if (mounted) setState(() {});
+      });
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => formScreen),
+      ).then((_) {
+        widget.onReturnFromForm?.call();
+        if (mounted) setState(() {});
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final medicationProvider = Provider.of<MedicationProvider>(context);
-    final medications = medicationProvider.medications;
+    final medications = widget.medicationService.medications;
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false, // Part of bottom navigation
         title: Text(l10n.medications),
         elevation: 0,
       ),
-      body: medications.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: RefreshIndicator(
+        onRefresh: _refreshMedications,
+        child: medications.isEmpty
+            ? ListView(
+                // Use ListView to enable pull-to-refresh even when empty
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  Icon(
-                    Icons.medication_outlined,
-                    size: 80,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.noMedications,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.grey[600],
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.medication_outlined,
+                            size: 80,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.noMedications,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.pullToRefresh,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
+              )
+            : ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                itemCount: medications.length,
+                itemBuilder: (context, index) {
+                  final medication = medications[index];
+                  return _MedicationCard(
+                    medication: medication,
+                    reminderService: widget.reminderService,
+                    onTap: () {
+                      _navigateToForm(medication: medication);
+                    },
+                    onDelete: () => _showDeleteDialog(context, medication),
+                  );
+                },
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: medications.length,
-              itemBuilder: (context, index) {
-                final medication = medications[index];
-                return _MedicationCard(
-                  medication: medication,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MedicineFormScreen(
-                          medication: medication,
-                        ),
-                      ),
-                    );
-                  },
-                  onDelete: () => _showDeleteDialog(context, medication),
-                );
-              },
-            ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          context.go('/medicine-form');
+          _navigateToForm();
         },
         icon: const Icon(Icons.add),
         label: Text(l10n.addMedication),
@@ -104,16 +185,12 @@ class MedicationsScreen extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      final medicationProvider =
-          Provider.of<MedicationProvider>(context, listen: false);
-      final reminderProvider =
-          Provider.of<ReminderProvider>(context, listen: false);
-
       // Delete medication and its reminders
-      await medicationProvider.deleteMedication(medication.id);
-      await reminderProvider.deleteRemindersForMedication(medication.id);
+      await widget.medicationService.deleteMedication(medication.id);
+      await widget.reminderService.deleteRemindersForMedication(medication.id);
 
       if (context.mounted) {
+        setState(() {}); // Refresh UI
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.medicationDeleted),
@@ -127,11 +204,13 @@ class MedicationsScreen extends StatelessWidget {
 
 class _MedicationCard extends StatelessWidget {
   final Medication medication;
+  final ReminderService reminderService;
   final VoidCallback onTap;
   final VoidCallback onDelete;
 
   const _MedicationCard({
     required this.medication,
+    required this.reminderService,
     required this.onTap,
     required this.onDelete,
   });
@@ -139,8 +218,7 @@ class _MedicationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final reminderProvider = Provider.of<ReminderProvider>(context);
-    final reminders = reminderProvider.getRemindersForMedication(medication.id);
+    final reminders = reminderService.getRemindersForMedication(medication.id);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -298,7 +376,7 @@ class _MedicationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          '${_formatTime(reminder.time)} - ${_getTimeOfDayString(l10n, reminder.timeOfDay)}',
+                          '${_formatTime(reminder.time)} - ${_getMealTimeString(l10n, reminder.mealTime)}',
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey[700],
@@ -353,19 +431,16 @@ class _MedicationCard extends StatelessWidget {
     return '$hour:$minute';
   }
 
-  String _getTimeOfDayString(
-      AppLocalizations l10n, MedicationTimeOfDay timeOfDay) {
-    switch (timeOfDay) {
-      case MedicationTimeOfDay.morning:
-        return l10n.morning;
-      case MedicationTimeOfDay.afternoon:
-        return l10n.afternoon;
-      case MedicationTimeOfDay.evening:
-        return l10n.evening;
-      case MedicationTimeOfDay.night:
-        return l10n.night;
-      case MedicationTimeOfDay.other:
-        return l10n.other;
+  String _getMealTimeString(AppLocalizations l10n, MealTime mealTime) {
+    switch (mealTime) {
+      case MealTime.breakfast:
+        return l10n.breakfast;
+      case MealTime.lunch:
+        return l10n.lunch;
+      case MealTime.dinner:
+        return l10n.dinner;
+      case MealTime.bedtime:
+        return l10n.bedtime;
     }
   }
 

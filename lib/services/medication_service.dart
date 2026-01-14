@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
-import '../../services/storage_service.dart';
-import '../../models/medication.dart';
+import 'storage_service.dart';
+import '../models/medication.dart';
 
-/// Provider to manage medications with CRUD operations
-class MedicationProvider extends ChangeNotifier {
+/// Service to manage medications with CRUD operations
+class MedicationService {
+  static final MedicationService _instance = MedicationService._internal();
+  factory MedicationService() => _instance;
+  MedicationService._internal();
+
   final StorageService _storageService = StorageService();
 
   List<Medication> _medications = [];
@@ -15,12 +18,10 @@ class MedicationProvider extends ChangeNotifier {
   /// Initialize medications from storage
   Future<void> initialize() async {
     _isLoading = true;
-    notifyListeners();
 
     _medications = await _storageService.getMedications();
 
     _isLoading = false;
-    notifyListeners();
   }
 
   /// Get medication by ID
@@ -36,7 +37,6 @@ class MedicationProvider extends ChangeNotifier {
   Future<Medication> addMedication(Medication medication) async {
     _medications.add(medication);
     await _storageService.saveMedications(_medications);
-    notifyListeners();
     return medication;
   }
 
@@ -46,7 +46,6 @@ class MedicationProvider extends ChangeNotifier {
     if (index != -1) {
       _medications[index] = medication;
       await _storageService.saveMedications(_medications);
-      notifyListeners();
     }
   }
 
@@ -54,13 +53,11 @@ class MedicationProvider extends ChangeNotifier {
   Future<void> deleteMedication(String medicationId) async {
     _medications.removeWhere((med) => med.id == medicationId);
     await _storageService.saveMedications(_medications);
-    notifyListeners();
   }
 
   /// Clear all medications
   Future<void> clearAllMedications() async {
     _medications.clear();
     await _storageService.saveMedications(_medications);
-    notifyListeners();
   }
 }

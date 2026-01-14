@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/medication_provider.dart';
-import '../providers/intake_history_provider.dart';
+import '../../services/medication_service.dart';
+import '../../services/intake_history_service.dart';
 import '../../models/intakeHistory.dart';
 
 /// In-app notification overlay that appears when a reminder is due
@@ -11,6 +10,8 @@ class InAppNotification extends StatefulWidget {
   final String medicationName;
   final String dosageInfo;
   final VoidCallback onDismiss;
+  final MedicationService? medicationService;
+  final IntakeHistoryService? intakeHistoryService;
 
   const InAppNotification({
     super.key,
@@ -18,7 +19,15 @@ class InAppNotification extends StatefulWidget {
     required this.medicationName,
     required this.dosageInfo,
     required this.onDismiss,
+    this.medicationService,
+    this.intakeHistoryService,
   });
+
+  // Singleton getters for fallback access
+  MedicationService get _medicationService =>
+      medicationService ?? MedicationService();
+  IntakeHistoryService get _intakeHistoryService =>
+      intakeHistoryService ?? IntakeHistoryService();
 
   @override
   State<InAppNotification> createState() => _InAppNotificationState();
@@ -73,18 +82,13 @@ class _InAppNotificationState extends State<InAppNotification>
   }
 
   void _markAsTaken() async {
-    final intakeHistoryProvider =
-        Provider.of<IntakeHistoryProvider>(context, listen: false);
-    final medicationProvider =
-        Provider.of<MedicationProvider>(context, listen: false);
-
     final medication =
-        medicationProvider.getMedicationById(widget.medicationId);
+        widget._medicationService.getMedicationById(widget.medicationId);
     if (medication != null) {
       final now = DateTime.now();
 
       // Try to find existing intake history for this time
-      final todayIntakes = intakeHistoryProvider.getTodayHistories();
+      final todayIntakes = widget._intakeHistoryService.getTodayHistories();
       final existingIntake = todayIntakes.cast<IntakeHistory?>().firstWhere(
             (intake) =>
                 intake!.medicationId == widget.medicationId &&
@@ -94,7 +98,7 @@ class _InAppNotificationState extends State<InAppNotification>
 
       if (existingIntake != null) {
         // Mark existing intake as taken
-        await intakeHistoryProvider.markAsTaken(existingIntake.id);
+        await widget._intakeHistoryService.markAsTaken(existingIntake.id);
       } else {
         // Create new intake history (fallback if no pending intake found)
         final intake = IntakeHistory(
@@ -105,7 +109,7 @@ class _InAppNotificationState extends State<InAppNotification>
           takenAt: now,
         );
 
-        await intakeHistoryProvider.addHistory(intake);
+        await widget._intakeHistoryService.addHistory(intake);
       }
 
       if (mounted) {

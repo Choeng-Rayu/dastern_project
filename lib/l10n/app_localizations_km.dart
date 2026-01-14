@@ -72,6 +72,18 @@ class AppLocalizationsKm extends AppLocalizations {
   String get hello => 'សួស្តី';
 
   @override
+  String get morning => 'អរុណសួស្តី';
+
+  @override
+  String get afternoon => 'រសៀលសួស្តី';
+
+  @override
+  String get evening => 'សាយ័ណ្ហសួស្តី';
+
+  @override
+  String get night => 'រាត្រីសួស្តី';
+
+  @override
   String get dateOfBirth => 'ថ្ងៃកំណើត';
 
   @override
@@ -184,16 +196,16 @@ class AppLocalizationsKm extends AppLocalizations {
   String get remindersGenerated => 'បានបង្កើតការរំលឹកជោគជ័យ';
 
   @override
-  String get morning => 'ពេលព្រឹក';
+  String get breakfast => 'អាហារពេលព្រឹក';
 
   @override
-  String get afternoon => 'ពេលរសៀល';
+  String get lunch => 'អាហារថ្ងៃត្រង់';
 
   @override
-  String get evening => 'ពេលល្ងាច';
+  String get dinner => 'អាហារពេលល្ងាច';
 
   @override
-  String get night => 'ពេលយប់';
+  String get bedtime => 'ពេលចូលគេង';
 
   @override
   String get delete => 'លុប';
@@ -305,10 +317,22 @@ class AppLocalizationsKm extends AppLocalizations {
       'មិនទាន់បានបន្ថែមពេលវេលារំលឹកនៅឡើយទេ។ ចុច \'បន្ថែមពេលវេលា\' ដើម្បីកំណត់កាលវិភាគថ្នាំ។';
 
   @override
-  String get timeOfDay => 'ពេលវេលាក្នុងថ្ងៃ';
+  String get mealTime => 'ពេលអាហារ';
 
   @override
-  String get dosageAmount => 'ចំនួនប្រើ';
+  String get dosagePerReminder => 'បរិមាណក្នុងមួយដង';
+
+  @override
+  String get totalMedicationAmount => 'បរិមាណសរុប';
+
+  @override
+  String get duplicateReminderError => 'ការរំលឹកនៅពេលនេះមានរួចហើយ';
+
+  @override
+  String get duplicateMealTimeError => 'ការរំលឹកសម្រាប់ពេលអាហារនេះមានរួចហើយ';
+
+  @override
+  String get allMealTimesUsed => 'ពេលអាហារទាំងអស់ត្រូវបានកំណត់រួចហើយ';
 
   @override
   String get activeDays => 'ថ្ងៃសកម្ម';
@@ -408,4 +432,7 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get enterAddressHint => 'ភូមិ កុម សង្កាត់';
+
+  @override
+  String get pullToRefresh => 'ទាញចុះដើម្បីធ្វើឱ្យថ្មី';
 }

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/auth_provider.dart';
+import '../../services/auth_service.dart';
 import '../../models/patient.dart';
 
 /// Register screen - New user registration
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final AuthService authService;
+  final VoidCallback onRegisterSuccess;
+
+  const RegisterScreen({
+    super.key,
+    required this.authService,
+    required this.onRegisterSuccess,
+  });
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -105,8 +110,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
 
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
       // Create Patient object with all data
       final patient = Patient(
         name: _nameController.text.trim(),
@@ -121,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       // Register user with complete patient data and password
-      await authProvider.register(
+      await widget.authService.register(
         patient: patient,
         password: _passwordController.text,
       );
@@ -131,6 +134,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _isLoading = false;
         });
 
+        // Notify parent about registration success
+        widget.onRegisterSuccess();
+
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -139,11 +145,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         );
 
-        // Navigate to dashboard
-        await Future.delayed(const Duration(milliseconds: 500));
-        if (mounted) {
-          context.go('/dashboard');
-        }
+        // onRegisterSuccess handles navigation
       }
     }
   }
@@ -164,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   padding: EdgeInsets.zero,
                   alignment: Alignment.centerLeft,
@@ -544,7 +546,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      context.pushReplacement('/login');
+                                      Navigator.pushReplacementNamed(context, '/login');
                                     },
                                     child: Text(
                                       l10n.login,

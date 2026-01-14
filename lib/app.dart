@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:go_router/go_router.dart';
 import 'package:device_preview/device_preview.dart';
 
 import 'l10n/app_localizations.dart';
-import 'presentation/providers/settings_provider.dart';
-import 'presentation/providers/auth_provider.dart';
-import 'presentation/providers/reminder_provider.dart';
-import 'presentation/providers/medication_provider.dart';
+import 'services/settings_service.dart';
+import 'services/auth_service.dart';
+import 'services/reminder_service.dart';
+import 'services/medication_service.dart';
+import 'services/intake_history_service.dart';
+import 'services/notification_service.dart';
 import 'presentation/theme/theme.dart';
 import 'presentation/screens/main_navigation_screen.dart';
 import 'presentation/screens/welcome_screen.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/register_screen.dart';
-import 'presentation/screens/dashboard_screen.dart';
-import 'presentation/screens/medications_screen.dart';
-import 'presentation/screens/medicine_form_screen.dart';
-import 'presentation/screens/profile_screen.dart';
 import 'presentation/screens/intake_history_screen.dart';
 import 'presentation/screens/today_reminders_screen.dart';
 import 'presentation/widget/in_app_notification.dart';
 
 /// Main application widget with theming and localization setup
 class DasternApp extends StatefulWidget {
-  const DasternApp({super.key});
+  final NotificationService notificationService;
+  final SettingsService settingsService;
+  final AuthService authService;
+  final MedicationService medicationService;
+  final ReminderService reminderService;
+  final IntakeHistoryService intakeHistoryService;
+
+  const DasternApp({
+    super.key,
+    required this.notificationService,
+    required this.settingsService,
+    required this.authService,
+    required this.medicationService,
+    required this.reminderService,
+    required this.intakeHistoryService,
+  });
 
   @override
   State<DasternApp> createState() => _DasternAppState();
@@ -32,11 +43,22 @@ class DasternApp extends StatefulWidget {
 
 class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
   OverlayEntry? _currentNotificationOverlay;
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  // Local state for theme and locale
+  late ThemeMode _themeMode;
+  late Locale _locale;
+  late bool _isLoggedIn;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // Initialize local state from services
+    _themeMode = widget.settingsService.themeMode;
+    _locale = widget.settingsService.locale;
+    _isLoggedIn = widget.authService.isLoggedIn;
   }
 
   @override
@@ -55,21 +77,53 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
     }
   }
 
+  /// Update theme mode and refresh UI
+  void updateThemeMode(ThemeMode mode) async {
+    await widget.settingsService.setThemeMode(mode);
+    setState(() {
+      _themeMode = mode;
+    });
+  }
+
+  /// Update locale and refresh UI
+  void updateLocale(Locale locale) async {
+    await widget.settingsService.setLocale(locale);
+    setState(() {
+      _locale = locale;
+    });
+  }
+
+  /// Update login state and navigate accordingly
+  void updateLoginState(bool isLoggedIn) {
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+    });
+    
+    // Navigate based on login state
+    if (isLoggedIn) {
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => _buildMainNavigation()),
+        (route) => false,
+      );
+    } else {
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => _buildWelcomeScreen()),
+        (route) => false,
+      );
+    }
+  }
+
   /// Check for reminders that are due now and show in-app notifications
   void _checkForDueReminders() {
     if (!mounted) return;
 
-    final authProvider = context.read<AuthProvider>();
-    if (!authProvider.isLoggedIn) return;
-
-    final reminderProvider = context.read<ReminderProvider>();
-    final medicationProvider = context.read<MedicationProvider>();
+    if (!widget.authService.isLoggedIn) return;
 
     final now = DateTime.now();
     const Duration checkWindow = Duration(minutes: 10); // Check last 10 minutes
 
     // Find reminders that are due (within last 10 minutes and not yet in the future)
-    final dueReminders = reminderProvider.reminders.where((reminder) {
+    final dueReminders = widget.reminderService.reminders.where((reminder) {
       if (!reminder.isActive) return false;
 
       final reminderTime = DateTime(
@@ -89,7 +143,7 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
     // Show in-app notification for each due reminder
     for (final reminder in dueReminders) {
       final medication =
-          medicationProvider.medications.cast<dynamic>().firstWhere(
+          widget.medicationService.medications.cast<dynamic>().firstWhere(
                 (med) => med.id == reminder.medicationId,
                 orElse: () => null,
               );
@@ -121,6 +175,8 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
           _currentNotificationOverlay?.remove();
           _currentNotificationOverlay = null;
         },
+        intakeHistoryService: widget.intakeHistoryService,
+        medicationService: widget.medicationService,
       ),
     );
 
@@ -143,144 +199,105 @@ class _DasternAppState extends State<DasternApp> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Consumer2<SettingsProvider, AuthProvider>(
-      builder: (context, settings, auth, child) {
-        final router = _createRouter(auth);
-
-        return MaterialApp.router(
-          // Application metadata
-          title: 'DasTern',
-          debugShowCheckedModeBanner: false,
-
-          // Device Preview configuration
-          locale: DevicePreview.locale(context) ?? settings.locale,
-          builder: DevicePreview.appBuilder,
-
-          // Localization configuration
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'), // English
-            Locale('km'), // Khmer
-          ],
-
-          // Theme configuration - using centralized AppTheme
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: settings.themeMode,
-
-          // Router configuration
-          routerConfig: router,
-        );
-      },
+  /// Build Welcome Screen
+  Widget _buildWelcomeScreen() {
+    return WelcomeScreen(
+      settingsService: widget.settingsService,
+      onLocaleChanged: updateLocale,
     );
   }
 
-  /// Create GoRouter configuration
-  GoRouter _createRouter(AuthProvider authProvider) {
-    return GoRouter(
-      initialLocation: '/',
-      redirect: (context, state) {
-        final isLoggedIn = authProvider.isLoggedIn;
-        final isLoading = authProvider.isLoading;
+  /// Build Main Navigation Screen
+  Widget _buildMainNavigation() {
+    return MainNavigationScreen(
+      authService: widget.authService,
+      medicationService: widget.medicationService,
+      reminderService: widget.reminderService,
+      intakeHistoryService: widget.intakeHistoryService,
+      settingsService: widget.settingsService,
+      notificationService: widget.notificationService,
+      onThemeChanged: updateThemeMode,
+      onLocaleChanged: updateLocale,
+      onLogout: () => updateLoginState(false),
+    );
+  }
 
-        // Wait for auth to initialize
-        if (isLoading) {
-          return null;
-        }
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // Application metadata
+      title: 'DasTern',
+      debugShowCheckedModeBanner: false,
+      navigatorKey: _navigatorKey,
 
-        final isAuthRoute = state.matchedLocation == '/' ||
-            state.matchedLocation == '/login' ||
-            state.matchedLocation == '/register';
+      // Locale - use our state directly (DevicePreview can override in debug)
+      locale: _locale,
+      builder: DevicePreview.appBuilder,
 
-        // If not logged in and trying to access protected route, redirect to welcome
-        if (!isLoggedIn && !isAuthRoute) {
-          return '/';
-        }
-
-        // If logged in and on auth route, redirect to dashboard
-        if (isLoggedIn && isAuthRoute) {
-          return '/dashboard';
-        }
-
-        return null;
-      },
-      routes: [
-        // Welcome Screen
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const WelcomeScreen(),
-        ),
-
-        // Login Screen
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-
-        // Register Screen
-        GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterScreen(),
-        ),
-
-        // Main App Navigation (Dashboard, Medicine List, etc.)
-        StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) {
-            return MainNavigationScreen(navigationShell: navigationShell);
-          },
-          branches: [
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/dashboard',
-                  builder: (context, state) => const DashboardScreen(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/medicine-list',
-                  builder: (context, state) => const MedicationsScreen(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/medicine-form',
-                  builder: (context, state) => const MedicineFormScreen(),
-                ),
-              ],
-            ),
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: '/profile',
-                  builder: (context, state) => const ProfileScreen(),
-                ),
-              ],
-            ),
-          ],
-        ),
-
-        // Standalone screens
-        GoRoute(
-          path: '/today-reminders',
-          builder: (context, state) => const TodayRemindersScreen(),
-        ),
-        GoRoute(
-          path: '/intake-history',
-          builder: (context, state) => const IntakeHistoryScreen(),
-        ),
+      // Localization configuration
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('km'), // Khmer
+      ],
+
+      // Theme configuration - using centralized AppTheme
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: _themeMode,
+
+      // Initial screen based on login state
+      home: _isLoggedIn ? _buildMainNavigation() : _buildWelcomeScreen(),
+
+      // Named routes for navigation
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/login':
+            return MaterialPageRoute(
+              builder: (_) => LoginScreen(
+                authService: widget.authService,
+                medicationService: widget.medicationService,
+                reminderService: widget.reminderService,
+                intakeHistoryService: widget.intakeHistoryService,
+                onLoginSuccess: () => updateLoginState(true),
+              ),
+            );
+          case '/register':
+            return MaterialPageRoute(
+              builder: (_) => RegisterScreen(
+                authService: widget.authService,
+                onRegisterSuccess: () => updateLoginState(true),
+              ),
+            );
+          case '/today-reminders':
+            return MaterialPageRoute(
+              builder: (_) => TodayRemindersScreen(
+                reminderService: widget.reminderService,
+                medicationService: widget.medicationService,
+                intakeHistoryService: widget.intakeHistoryService,
+              ),
+            );
+          case '/intake-history':
+            return MaterialPageRoute(
+              builder: (_) => IntakeHistoryScreen(
+                medicationService: widget.medicationService,
+                intakeHistoryService: widget.intakeHistoryService,
+              ),
+            );
+          default:
+            return MaterialPageRoute(
+              builder: (_) => _isLoggedIn 
+                ? _buildMainNavigation() 
+                : _buildWelcomeScreen(),
+            );
+        }
+      },
     );
   }
 }
+

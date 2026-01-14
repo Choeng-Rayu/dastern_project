@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../l10n/app_localizations.dart';
-import '../providers/medication_provider.dart';
-import '../providers/reminder_provider.dart';
-import '../providers/intake_history_provider.dart';
+import '../../services/medication_service.dart';
+import '../../services/reminder_service.dart';
+import '../../services/intake_history_service.dart';
 import '../../models/intakeHistory.dart';
 import '../../models/medication.dart';
 
 /// Today's Reminders Screen - Shows medication schedule for today
 class TodayRemindersScreen extends StatefulWidget {
-  const TodayRemindersScreen({super.key});
+  final ReminderService reminderService;
+  final MedicationService medicationService;
+  final IntakeHistoryService intakeHistoryService;
+
+  const TodayRemindersScreen({
+    super.key,
+    required this.reminderService,
+    required this.medicationService,
+    required this.intakeHistoryService,
+  });
 
   @override
   State<TodayRemindersScreen> createState() => _TodayRemindersScreenState();
@@ -24,25 +32,23 @@ class _TodayRemindersScreenState extends State<TodayRemindersScreen> {
   }
 
   Future<void> _initializeData() async {
-    final reminderProvider =
-        Provider.of<ReminderProvider>(context, listen: false);
-    final historyProvider =
-        Provider.of<IntakeHistoryProvider>(context, listen: false);
-
     // Generate today's intake histories if not already done
-    await historyProvider.generateTodayIntakes(reminderProvider.reminders);
+    await widget.intakeHistoryService
+        .generateTodayIntakes(widget.reminderService.reminders);
 
     // Update missed intakes
-    await historyProvider.updateMissedIntakes();
+    await widget.intakeHistoryService.updateMissedIntakes();
+
+    if (mounted) {
+      setState(() {}); // Refresh UI
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final historyProvider = Provider.of<IntakeHistoryProvider>(context);
-    final medicationProvider = Provider.of<MedicationProvider>(context);
 
-    final todayHistories = historyProvider.getTodayHistories();
+    final todayHistories = widget.intakeHistoryService.getTodayHistories();
     final pendingIntakes =
         todayHistories.where((h) => h.status == IntakeStatus.pending).toList();
     final completedIntakes =
@@ -103,7 +109,7 @@ class _TodayRemindersScreenState extends State<TodayRemindersScreen> {
                     ),
                     const SizedBox(height: 12),
                     ...pendingIntakes.map((history) {
-                      final medication = medicationProvider
+                      final medication = widget.medicationService
                           .getMedicationById(history.medicationId);
                       if (medication == null) return const SizedBox.shrink();
 
@@ -128,7 +134,7 @@ class _TodayRemindersScreenState extends State<TodayRemindersScreen> {
                     ),
                     const SizedBox(height: 12),
                     ...completedIntakes.map((history) {
-                      final medication = medicationProvider
+                      final medication = widget.medicationService
                           .getMedicationById(history.medicationId);
                       if (medication == null) return const SizedBox.shrink();
 
@@ -226,9 +232,11 @@ class _TodayRemindersScreenState extends State<TodayRemindersScreen> {
   }
 
   Future<void> _markAsTaken(BuildContext context, String historyId) async {
-    final historyProvider =
-        Provider.of<IntakeHistoryProvider>(context, listen: false);
-    await historyProvider.markAsTaken(historyId);
+    await widget.intakeHistoryService.markAsTaken(historyId);
+
+    if (mounted) {
+      setState(() {}); // Refresh UI
+    }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -242,9 +250,11 @@ class _TodayRemindersScreenState extends State<TodayRemindersScreen> {
   }
 
   Future<void> _markAsSkipped(BuildContext context, String historyId) async {
-    final historyProvider =
-        Provider.of<IntakeHistoryProvider>(context, listen: false);
-    await historyProvider.markAsSkipped(historyId);
+    await widget.intakeHistoryService.markAsSkipped(historyId);
+
+    if (mounted) {
+      setState(() {}); // Refresh UI
+    }
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
